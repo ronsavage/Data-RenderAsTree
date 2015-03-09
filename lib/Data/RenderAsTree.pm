@@ -105,7 +105,7 @@ sub _add_daughter
 
 # ------------------------------------------------
 
-sub _process_array
+sub _process_arrayref
 {
 	my($self, $parent, $value) = @_;
 	my($index) = - 1;
@@ -118,7 +118,7 @@ sub _process_array
 
 		if ($ref_type eq 'ARRAY')
 		{
-			$self -> _process_array($parent, $item);
+			$self -> _process_arrayref($parent, $item);
 		}
 		elsif ($ref_type eq 'HASH')
 		{
@@ -138,7 +138,7 @@ sub _process_array
 		}
 	}
 
-} # End of _process_array;
+} # End of _process_arrayref;
 
 # ------------------------------------------------
 
@@ -166,7 +166,7 @@ sub _process_hashref
 		{
 			$self -> stack -> push($node);
 
-			$self -> _process_array($node, $value);
+			$self -> _process_arrayref($node, $value);
 
 			$self -> stack -> pop;
 		}
