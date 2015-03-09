@@ -134,7 +134,7 @@ sub _process_arrayref
 
 			$index++;
 
-			$self -> _process_scalar($parent, "$index = " . defined($item) ? truncstr($item, $self -> max_value_length) : 'undef');
+			$self -> _process_scalar($parent, "$index = " . (defined($item) ? truncstr($item, $self -> max_value_length) : 'undef') );
 		}
 	}
 
