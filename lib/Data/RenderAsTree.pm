@@ -13,7 +13,7 @@ use Text::Truncate; # For truncstr().
 
 use Tree::DAG_Node;
 
-use Types::Standard qw/Bool Int Object Str/;
+use Types::Standard qw/Any Bool Int Object Str/;
 
 has attributes =>
 (
@@ -36,6 +36,14 @@ has max_value_length =>
 	default   => sub{return 10_000},
 	is        => 'rw',
 	isa       => Int,
+	required => 0,
+);
+
+has root =>
+(
+	default   => sub{return ''},
+	is        => 'rw',
+	isa       => Any,
 	required => 0,
 );
 
@@ -215,7 +223,7 @@ sub process_tree
 	my($uid);
 	my($value);
 
-	${$self -> stack}[0] -> walk_down
+	$self -> root -> walk_down
 	({
 		callback => sub
 		{
@@ -275,15 +283,16 @@ sub process_tree
 sub run
 {
 	my($self, $s) = @_;
-	my($root) = Tree::DAG_Node -> new({name => $self -> title});
 
-	$self -> stack -> push($root);
+	$self -> root(Tree::DAG_Node -> new({name => $self -> title}) );
+
+	$self -> stack -> push($self -> root);
 
 	my($ref_type) = reftype $s;
 
 	if ($ref_type eq 'ARRAY')
 	{
-		$self -> _process_arrayref($root, $s);
+		$self -> _process_arrayref($self -> root, $s);
 	}
 	elsif ($ref_type eq 'HASH')
 	{
@@ -291,11 +300,11 @@ sub run
 	}
 	elsif ($ref_type eq 'REF')
 	{
-		$self -> _process_scalar($root, $s);
+		$self -> _process_scalar($self -> root, $s);
 	}
 	elsif ($ref_type eq 'SCALAR')
 	{
-		$self -> _process_scalar($root, $s);
+		$self -> _process_scalar($self -> root, $s);
 	}
 	else
 	{
@@ -304,7 +313,7 @@ sub run
 
 	$self -> process_tree;
 
-	return $root -> tree2string({no_attributes => 1 - $self -> attributes});
+	return $self -> root -> tree2string({no_attributes => 1 - $self -> attributes});
 
 } # End of run.
 
@@ -519,6 +528,12 @@ various bits of data attached to each node in the tree.
 If sub-classing this module, e.g. to change the precise text displayed, I recommend concentrating
 your efforts on this method.
 
+Alternately, see the answer to the first question in the L</FAQ>.
+
+=head2 root()
+
+Returns the root node in the tree, which is an object of type L<Tree::DAG_Node>.
+
 =head2 run($s)
 
 Renders $s into an object of type L<Tree::DAG_Node>.
@@ -536,6 +551,12 @@ Gets or sets the title, which is the name of the root node in the tree.
 C<title> is a parameter to L</new()>.
 
 =head1 FAQ
+
+=head2 Can I process the tree myself?
+
+Sure. Just call L</root()> - after L</run()> - to get the root of the tree, and process it any way you wish.
+
+See L</process_tree()> for sample code.
 
 =head2 What did you use Text::Truncate?
 
