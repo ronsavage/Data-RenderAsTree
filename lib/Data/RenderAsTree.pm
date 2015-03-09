@@ -489,7 +489,7 @@ Note: The value passed to L<Tree::DAG_Node>'s tree2string() method is (1 - $Bool
 
 C<attributes> is a parameter to L</new()>.
 
-=head max_key_length([$int])
+=head2 max_key_length([$int])
 
 Here, the [] indicate an optional parameter.
 
@@ -497,7 +497,7 @@ Gets or sets the maximum string length displayed for hash keys.
 
 C<max_key_length> is a parameter to L</new()>.
 
-=head max_key_length([$int])
+=head2 max_key_length([$int])
 
 Here, the [] indicate an optional parameter.
 

@@ -10,5 +10,6 @@ META.json
 META.yml
 README
 scripts/synopsis.pl
+t/expected.dat
 t/test.t
 xt/author/pod.t
