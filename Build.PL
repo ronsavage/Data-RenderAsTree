@@ -41,9 +41,13 @@ $class -> new
 	},
 	requires =>
 	{
+		'File::Slurp' => 9999.19,
+		'File::Spec' => 0,
 		'Moo' => 1.007000,
+		'Scalar::Util' => 1.41,
+		'Set::Array' => 0.30,
 		'strict' => 0,
-		'Text::Elide' => 'v0.0.3',
+		'Text::Truncate' => '1.06',
 		'Tree::DAG_Node' => 1.24,
 		'Types::Standard' => 1.000005,
 		'warnings' => 0,

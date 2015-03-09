@@ -324,7 +324,6 @@ This is scripts/synopsis.pl:
 
 	#!/usr/bin/env perl
 
-	use lib 'lib'; # This is so t/test.t works properly.
 	use strict;
 	use warnings;
 
