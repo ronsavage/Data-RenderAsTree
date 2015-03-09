@@ -134,7 +134,7 @@ sub _process_arrayref
 
 			$index++;
 
-			$self -> _process_scalar($parent, "$index = " . truncstr($item, $self -> max_value_length) );
+			$self -> _process_scalar($parent, "$index = " . defined($item) ? truncstr($item, $self -> max_value_length) || 'undef');
 		}
 	}
 
@@ -157,8 +157,7 @@ sub _process_hashref
 		$ref_type = reftype($value) || 'VALUE';
 		$node     = $self -> _add_daughter
 			(
-				$key,
-				#truncstr($key, $self -> max_key_length),
+				$key, #truncstr($key, $self -> max_key_length),
 				{type => $ref_type, value => $value}
 			);
 
@@ -257,7 +256,7 @@ sub process_tree
 			elsif ($ref_type eq 'VALUE')
 			{
 				$id   = $key;
-				$name = truncstr($name, $self -> max_key_length) . ' = ' . truncstr($value, $self -> max_value_length);
+				$name = (defined($name) ? truncstr($name, $self -> max_key_length) : 'undef') . ' = ' . (defined($value) ? truncstr($value, $self -> max_value_length) || 'undef');
 			}
 			else
 			{
