@@ -396,14 +396,16 @@ L<Data::RenderAsTree> provides a mechanism to display a Perl data structure.
 
 The data supplied to L</run($s)> is stored in an object of type L<Tree::DAG_Node>.
 
-C<run()> returns an arrayref by calling C<Tree::DAG_Node>'s tree2string() method.
+C<run()> returns an arrayref by calling C<Tree::DAG_Node>'s C<tree2string()> method.
 
 This means you can display as much or as little of the result as you wish.
 
 Hash key lengths can be limited by L</max_key_length($int)>, and hash value lengths can be limited
 by L</max_value_length($int)>.
 
-The module serves as a replacement for L<Data::TreeDumper>, but without the huge set of
+For sub-classing, see L</process_tree()>.
+
+The module serves as a simple replacement for L<Data::TreeDumper>, but without the huge set of
 features.
 
 =head1 Distributions
@@ -485,7 +487,7 @@ Here, the [] indicate an optional parameter.
 
 Gets or sets the attributes option.
 
-Note: The value passed to L<Tree::DAG_Node>'s tree2string() method is (1 - $Boolean).
+Note: The value passed to L<Tree::DAG_Node>'s C<tree2string()> method is (1 - $Boolean).
 
 C<attributes> is a parameter to L</new()>.
 
@@ -509,11 +511,19 @@ C<max_key_length> is a parameter to L</new()>.
 
 See L</Constructor and Initialization> for details on the parameters accepted by L</new()>.
 
+=head2 process_tree()
+
+Just before L</run($s)> returns, it calls C<process_tree()>, while walks the tree and adjusts
+various bits of data attached to each node in the tree.
+
+If sub-classing this module, e.g. to change the precise text displayed, I recommend concentrating
+your efforts on this method.
+
 =head2 run($s)
 
 Renders $s into an object of type L<Tree::DAG_Node>.
 
-Returns an arrayref after calling the C<tree2string()> method for <Tree::DAG_Node>.
+Returns an arrayref after calling the C<tree2string()> method for L<Tree::DAG_Node>.
 
 See L</Synopsis> for typical usage.
 
@@ -533,6 +543,10 @@ The major alternatives are L<String::Truncate> and L<Text::Elide>.
 
 The former seems too complex, and the latter truncates to whole words, which makes sense in some
 applications, but not for dumping raw data.
+
+=head2 How would I go about sub-classing this module?
+
+This matter is discussed in the notes for method L</process_tree()>.
 
 =head1 See Also
 
