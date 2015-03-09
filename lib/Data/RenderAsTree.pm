@@ -134,7 +134,7 @@ sub _process_arrayref
 
 			$index++;
 
-			$self -> _process_scalar($parent, "$index = " . defined($item) ? truncstr($item, $self -> max_value_length) || 'undef');
+			$self -> _process_scalar($parent, "$index = " . defined($item) ? truncstr($item, $self -> max_value_length) : 'undef');
 		}
 	}
 
@@ -256,7 +256,7 @@ sub process_tree
 			elsif ($ref_type eq 'VALUE')
 			{
 				$id   = $key;
-				$name = (defined($name) ? truncstr($name, $self -> max_key_length) : 'undef') . ' = ' . (defined($value) ? truncstr($value, $self -> max_value_length) || 'undef');
+				$name = (defined($name) ? truncstr($name, $self -> max_key_length) : 'undef') . ' = ' . (defined($value) ? truncstr($value, $self -> max_value_length) : 'undef');
 			}
 			else
 			{

@@ -29,8 +29,8 @@ my(@expected)  = map{clean($_)} split(/\n/, read_file($file_name));
 my($synopsis)  = File::Spec -> catfile('scripts', 'synopsis.pl');
 my(@got)       = map{clean($_)} split(/\n/, `$^X -Ilib $synopsis`);
 
-#diag "Got: " . join('', @got);
-#diag "Exp: " . join('', @expected);
+diag "Got: " . join('', @got);
+diag "Exp: " . join('', @expected);
 
 ok(join('', @got) eq join('', @expected), 'Processed t/expected.dat'); $count++;
 
