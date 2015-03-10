@@ -5,20 +5,16 @@ use warnings;
 
 use Data::RenderAsTree;
 
-use Tree::DAG_Node;
-
 # ------------------------------------------------
 
-my($s) =
-{
-	root => Tree::DAG_Node -> new({name => 'Root', attributes => {one => 1} }),
-};
+#my($s)      = ['a', ['b', 'c'], [d => {e => 'f', 'g' => ['h', ['i'], 'j']}, 'k'], 'l', 'm'];
+my($s)      = ['a'];
 my($result) = Data::RenderAsTree -> new
 	(
 		attributes       => 0,
 		max_key_length   => 15,
 		max_value_length => 10,
-		title            => 'Bless',
+		title            => 'Array',
 		verbose          => 1,
 	) -> run($s);
 

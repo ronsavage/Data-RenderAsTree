@@ -132,7 +132,7 @@ sub _process_arrayref
 
 		if ($bless_type)
 		{
-			$self -> stack -> push($self -> _process_scalar($self -> _tos, "Class = $bless_type", 'BLESS') );
+			$self -> stack -> push($self -> _process_scalar("Class = $bless_type", 'BLESS') );
 		}
 
 		if ($ref_type eq 'ARRAY')
@@ -141,11 +141,11 @@ sub _process_arrayref
 		}
 		elsif ($ref_type eq 'HASH')
 		{
-			$self -> _process_hashref($item);
+			$self -> _process_hashref($parent, $item);
 		}
 		elsif ($ref_type eq 'SCALAR')
 		{
-			$self -> _process_scalar($parent, $item);
+			$self -> _process_scalar($item);
 		}
 		else
 		{
@@ -153,7 +153,7 @@ sub _process_arrayref
 
 			$index++;
 
-			$self -> _process_scalar($parent, "$index = " . (defined($item) ? truncstr($item, $self -> max_value_length) : 'undef') );
+			$self -> _process_scalar("$index = " . (defined($item) ? truncstr($item, $self -> max_value_length) : 'undef') );
 		}
 
 		$self -> stack -> pop if ($bless_type);
@@ -165,10 +165,10 @@ sub _process_arrayref
 
 sub _process_hashref
 {
-	my($self, $data) = @_;
+	my($self, $parent, $data) = @_;
 	my($tos)  = $self -> stack -> length - 1;
 
-	print "Entered _process_hashref($data)\n" if ($self -> verbose);
+	print "Entered _process_hashref($parent, $data)\n" if ($self -> verbose);
 
 	my($bless_type);
 	my($node);
@@ -188,34 +188,31 @@ sub _process_hashref
 
 		if ($bless_type)
 		{
-			$self -> stack -> push($self -> _process_scalar($self -> _tos, "Class = $bless_type", 'BLESS') );
+			$self -> stack -> push($node);
+
+			$node = $self -> _process_scalar("Class = $bless_type", 'BLESS');
 		}
+
+		$self -> stack -> push($node);
 
 		if ($ref_type eq 'ARRAY')
 		{
-			$self -> stack -> push($node);
-
 			$self -> _process_arrayref($node, $value);
-
-			$self -> stack -> pop;
 		}
 		elsif ($ref_type eq 'HASH')
 		{
-			$self -> stack -> push($node);
-
-			$self -> _process_hashref($value);
-
-			$self -> stack -> pop;
+			$self -> _process_hashref($parent, $value);
 		}
 		elsif ($ref_type eq 'REF')
 		{
-			$self -> _process_scalar($node, $value);
+			$self -> _process_scalar($$value, undef);
 		}
 		elsif ($ref_type eq 'SCALAR')
 		{
-			$self -> _process_scalar($node, $value);
+			$self -> _process_scalar($$value, undef);
 		}
 
+		$self -> stack -> pop;
 		$self -> stack -> pop if ($bless_type);
 	}
 
@@ -225,22 +222,16 @@ sub _process_hashref
 
 sub _process_scalar
 {
-	my($self, $parent, $value, $type) = @_;
+	my($self, $value, $type) = @_;
 	$type ||= 'SCALAR';
 
-	print "Entered _process_scalar($parent, $value, $type)\n" if ($self -> verbose);
+	print "Entered _process_scalar($value, $type)\n" if ($self -> verbose);
 
-	$self -> stack -> push($parent);
-
-	my($node) = $self -> _add_daughter
-		(
-			$value,
-			{type => $type, value => '-'}
-		);
-
-	$self -> stack -> pop;
-
-	return $node;
+	return $self -> _add_daughter
+			(
+				$value,
+				{type => $type, value => '-'}
+			);
 
 } # End of _process_scalar.
 
@@ -339,11 +330,11 @@ sub run
 	$self -> stack -> push($self -> root);
 
 	my($bless_type) = blessed $s;
-	my($ref_type)   = reftype $s;
+	my($ref_type)   = reftype $s || 'VALUE';
 
 	if ($bless_type)
 	{
-		$self -> stack -> push($self -> _process_scalar($self -> root, "Class = $bless_type", 'BLESS') );
+		$self -> stack -> push($self -> _process_scalar("Class = $bless_type", 'BLESS') );
 	}
 
 	if ($ref_type eq 'ARRAY')
@@ -352,39 +343,27 @@ sub run
 	}
 	elsif ($ref_type eq 'HASH')
 	{
-		$self -> _process_hashref($s);
+		$self -> _process_hashref($self -> root, $s);
 	}
 	elsif ($ref_type eq 'REF')
 	{
-		$self -> _process_scalar($self -> root, $s);
+		$self -> _process_scalar($s);
 	}
 	elsif ($ref_type eq 'SCALAR')
 	{
-		$self -> _process_scalar($self -> root, $s);
+		$self -> _process_scalar($s);
 	}
 	else
 	{
-		die "Sorry, don't know how to process a ref of type '$ref_type'\n";
+		$self -> _process_scalar($s, 'VALUE');
 	}
 
 	$self -> stack -> pop if ($bless_type);
-
 	$self -> process_tree;
 
 	return $self -> root -> tree2string({no_attributes => 1 - $self -> attributes});
 
 } # End of run.
-
-# ------------------------------------------------
-
-sub _tos
-{
-	my($self) = @_;
-	my($tos)  = $self -> stack -> length - 1;
-
-	return ${$self -> stack}[$tos];
-
-} # End of _tos.
 
 # ------------------------------------------------
 

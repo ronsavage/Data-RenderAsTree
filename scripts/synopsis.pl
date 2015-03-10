@@ -42,6 +42,7 @@ my($result) = Data::RenderAsTree -> new
 		max_key_length   => 15,
 		max_value_length => 10,
 		title            => 'Synopsis',
+		verbose          => 0,
 	) -> run($s);
 
 print join("\n", @$result), "\n";
