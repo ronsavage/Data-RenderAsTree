@@ -226,7 +226,7 @@ sub _process_hashref
 sub _process_scalar
 {
 	my($self, $parent, $value, $type) = @_;
-	$type ||= 'BLESS';
+	$type ||= 'SCALAR';
 
 	print "Entered _process_scalar($parent, $value, $type)\n" if ($self -> verbose);
 
