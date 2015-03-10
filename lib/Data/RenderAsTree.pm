@@ -5,7 +5,7 @@ use warnings;
 
 use Moo;
 
-use Scalar::Util 'reftype';
+use Scalar::Util qw/blessed reftype/;
 
 use Set::Array;
 
@@ -71,6 +71,14 @@ has uid =>
 	required => 0,
 );
 
+has verbose =>
+(
+	default  => sub{return 0},
+	is       => 'rw',
+	isa      => Bool,
+	required => 0,
+);
+
 our $VERSION = '1.00';
 
 # ------------------------------------------------
@@ -92,6 +100,8 @@ sub _add_daughter
 {
 	my($self, $name, $attributes)  = @_;
 
+	print "Entered _add_daughter($name, $attributes)\n" if ($self -> verbose);
+
 	$attributes       = {} if (! $attributes);
 	$$attributes{uid} = $self -> uid($self -> uid + 1);
 	my($node)         = Tree::DAG_Node -> new({name => $name, attributes => $attributes});
@@ -110,11 +120,20 @@ sub _process_arrayref
 	my($self, $parent, $value) = @_;
 	my($index) = - 1;
 
+	print "Entered _process_arrayref($parent, $value)\n" if ($self -> verbose);
+
+	my($bless_type);
 	my($ref_type);
 
 	for my $item (@$value)
 	{
-		$ref_type = reftype($item) || 'VALUE';
+		$bless_type = blessed $item;
+		$ref_type   = reftype($item) || 'VALUE';
+
+		if ($bless_type)
+		{
+			$self -> stack -> push($self -> _process_scalar($self -> _tos, "Class = $bless_type", 'BLESS') );
+		}
 
 		if ($ref_type eq 'ARRAY')
 		{
@@ -136,6 +155,8 @@ sub _process_arrayref
 
 			$self -> _process_scalar($parent, "$index = " . (defined($item) ? truncstr($item, $self -> max_value_length) : 'undef') );
 		}
+
+		$self -> stack -> pop if ($bless_type);
 	}
 
 } # End of _process_arrayref;
@@ -147,19 +168,28 @@ sub _process_hashref
 	my($self, $data) = @_;
 	my($tos)  = $self -> stack -> length - 1;
 
+	print "Entered _process_hashref($data)\n" if ($self -> verbose);
+
+	my($bless_type);
 	my($node);
 	my($ref_type);
 	my($value);
 
 	for my $key (sort keys %$data)
 	{
-		$value    = $$data{$key};
-		$ref_type = reftype($value) || 'VALUE';
-		$node     = $self -> _add_daughter
+		$value      = $$data{$key};
+		$bless_type = blessed $value;
+		$ref_type   = reftype($value) || 'VALUE';
+		$node       = $self -> _add_daughter
 			(
-				$key, #truncstr($key, $self -> max_key_length),
-				{type => $ref_type, value => $value}
+				truncstr($key, $self -> max_key_length),
+				{type => $ref_type, value => defined($value) ? $value : 'undef'}
 			);
+
+		if ($bless_type)
+		{
+			$self -> stack -> push($self -> _process_scalar($self -> _tos, "Class = $bless_type", 'BLESS') );
+		}
 
 		if ($ref_type eq 'ARRAY')
 		{
@@ -185,6 +215,8 @@ sub _process_hashref
 		{
 			$self -> _process_scalar($node, $value);
 		}
+
+		$self -> stack -> pop if ($bless_type);
 	}
 
 } # End of _process_hashref.
@@ -193,17 +225,22 @@ sub _process_hashref
 
 sub _process_scalar
 {
-	my($self, $parent, $value) = @_;
+	my($self, $parent, $value, $type) = @_;
+	$type ||= 'BLESS';
+
+	print "Entered _process_scalar($parent, $value, $type)\n" if ($self -> verbose);
 
 	$self -> stack -> push($parent);
 
-	$self -> _add_daughter
+	my($node) = $self -> _add_daughter
 		(
 			$value,
-			{type => 'SCALAR', value => '-'}
+			{type => $type, value => '-'}
 		);
 
 	$self -> stack -> pop;
+
+	return $node;
 
 } # End of _process_scalar.
 
@@ -212,6 +249,13 @@ sub _process_scalar
 sub process_tree
 {
 	my($self) = @_;
+
+	if ($self -> verbose)
+	{
+		print "Entered process_tree(). Printing tree before walk_down ...\n" if ($self -> verbose);
+		print join("\n", @{$self -> root -> tree2string({no_attributes => 0})}), "\n";
+		print '-' x 50, "\n";
+	}
 
 	my($attributes);
 	my($id);
@@ -282,12 +326,25 @@ sub process_tree
 sub run
 {
 	my($self, $s) = @_;
+	$s = defined($s) ? $s : 'undef';
 
-	$self -> root(Tree::DAG_Node -> new({name => $self -> title}) );
-
+	$self -> root
+	(
+		Tree::DAG_Node -> new
+		({
+			attributes => {type => '', uid => $self -> uid, value => ''},
+			name       => $self -> title,
+		})
+	);
 	$self -> stack -> push($self -> root);
 
-	my($ref_type) = reftype $s;
+	my($bless_type) = blessed $s;
+	my($ref_type)   = reftype $s;
+
+	if ($bless_type)
+	{
+		$self -> stack -> push($self -> _process_scalar($self -> root, "Class = $bless_type", 'BLESS') );
+	}
 
 	if ($ref_type eq 'ARRAY')
 	{
@@ -307,14 +364,27 @@ sub run
 	}
 	else
 	{
-		die "Sorry, don't know how to process a ref of type $ref_type\n";
+		die "Sorry, don't know how to process a ref of type '$ref_type'\n";
 	}
+
+	$self -> stack -> pop if ($bless_type);
 
 	$self -> process_tree;
 
 	return $self -> root -> tree2string({no_attributes => 1 - $self -> attributes});
 
 } # End of run.
+
+# ------------------------------------------------
+
+sub _tos
+{
+	my($self) = @_;
+	my($tos)  = $self -> stack -> length - 1;
+
+	return ${$self -> stack}[$tos];
+
+} # End of _tos.
 
 # ------------------------------------------------
 
@@ -549,6 +619,15 @@ Gets or sets the title, which is the name of the root node in the tree.
 
 C<title> is a parameter to L</new()>.
 
+=head2 verbose([$Boolean])
+
+Here, the [] indicate an optional parameter.
+
+Gets or sets the verbose option, which prints a message upon entry to each method, with parameters,
+and prints the tree at the start of L</process_tree()>.
+
+C<verbose> is a parameter to L</new()>.
+
 =head1 FAQ
 
 =head2 Can I process the tree myself?
@@ -556,6 +635,10 @@ C<title> is a parameter to L</new()>.
 Sure. Just call L</root()> - after L</run()> - to get the root of the tree, and process it any way you wish.
 
 See L</process_tree()> for sample code.
+
+=head2 Why do you decorate the output with e.g. [HASH 1] and not [H1]?
+
+I feel the style [H1] used by L<Data::TreeDumper> is unnecessarily cryptic.
 
 =head2 What did you use Text::Truncate?
 
