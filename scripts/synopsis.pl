@@ -5,6 +5,8 @@ use warnings;
 
 use Data::RenderAsTree;
 
+use Tree::DAG_Node;
+
 # ------------------------------------------------
 
 my($sub) = sub {};
