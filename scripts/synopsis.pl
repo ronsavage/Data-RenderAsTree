@@ -31,13 +31,14 @@ my($s)   =
 		}
 	},
 	DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD => 'd',
+	Object => Tree::DAG_Node -> new({name => 'A tree'}),
 	S => \'s', # Use ' in comment.
 };
 my($result) = Data::RenderAsTree -> new
 	(
 		attributes       => 0,
-		max_key_length   => 7,
-		max_value_length => 9,
+		max_key_length   => 15,
+		max_value_length => 10,
 		title            => 'Synopsis',
 	) -> run($s);
 

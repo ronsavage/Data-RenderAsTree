@@ -16,8 +16,8 @@ my($s)      = Tree::DAG_Node -> new({name => 'Parent', attributes => {one => 1} 
 my($result) = Data::RenderAsTree -> new
 	(
 		attributes       => 0,
-		max_key_length   => 50,
-		max_value_length => 60,
+		max_key_length   => 55,
+		max_value_length => 66,
 		title            => 'Synopsis',
 		verbose          => 0,
 	) -> run($s);
