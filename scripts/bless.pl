@@ -18,8 +18,8 @@ my($result) = Data::RenderAsTree -> new
 		attributes       => 0,
 		max_key_length   => 15,
 		max_value_length => 10,
-		title            => 'Bless',
+		title            => 'Bless Demo',
 		verbose          => 1,
-	) -> run($s);
+	) -> run($s, '');
 
 print join("\n", @$result), "\n";

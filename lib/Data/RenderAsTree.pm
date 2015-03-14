@@ -3,6 +3,8 @@ package Data::RenderAsTree;
 use strict;
 use warnings;
 
+use Data::Dumper::Concise; # For Dumper().
+
 use Moo;
 
 use Scalar::Util qw/blessed reftype/;
@@ -23,6 +25,14 @@ has attributes =>
 	required => 0,
 );
 
+has index_stack =>
+(
+	default   => sub{return Set::Array -> new},
+	is        => 'rw',
+	isa       => Object,
+	required => 0,
+);
+
 has max_key_length =>
 (
 	default   => sub{return 10_000},
@@ -39,19 +49,19 @@ has max_value_length =>
 	required => 0,
 );
 
+has node_stack =>
+(
+	default   => sub{return Set::Array -> new},
+	is        => 'rw',
+	isa       => Object,
+	required => 0,
+);
+
 has root =>
 (
 	default   => sub{return ''},
 	is        => 'rw',
 	isa       => Any,
-	required => 0,
-);
-
-has stack =>
-(
-	default   => sub{return Set::Array -> new},
-	is        => 'rw',
-	isa       => Object,
 	required => 0,
 );
 
@@ -105,9 +115,9 @@ sub _add_daughter
 	$attributes       = {} if (! $attributes);
 	$$attributes{uid} = $self -> uid($self -> uid + 1);
 	my($node)         = Tree::DAG_Node -> new({name => $name, attributes => $attributes});
-	my($tos)          = $self -> stack -> length - 1;
+	my($tos)          = $self -> node_stack -> length - 1;
 
-	${$self -> stack}[$tos] -> add_daughter($node);
+	${$self -> node_stack}[$tos] -> add_daughter($node);
 
 	return $node;
 
@@ -117,27 +127,45 @@ sub _add_daughter
 
 sub _process_arrayref
 {
-	my($self, $parent, $value) = @_;
-	my($index) = - 1;
+	my($self, $value) = @_;
+	my($index) = -1;
 
-	print "Entered _process_arrayref($parent, $value)\n" if ($self -> verbose);
+	print "Entered _process_arrayref($value)\n" if ($self -> verbose);
 
 	my($bless_type);
+	my($parent);
 	my($ref_type);
+
+	print "Length: $#$value. \n";
 
 	for my $item (@$value)
 	{
+		$index++;
+
+		print "Index: $index. Item: $item. \n";
+
+		if (! defined $parent)
+		{
+			my($i)  = $self -> index_stack -> last;
+			$parent = $self -> _process_scalar("$i []", 'ARRAY');
+
+			$self -> node_stack -> push($parent);
+		}
+
 		$bless_type = blessed $item;
 		$ref_type   = reftype($item) || 'VALUE';
 
 		if ($bless_type)
 		{
-			$self -> stack -> push($self -> _process_scalar("Class = $bless_type", 'BLESS') );
+			$self -> node_stack -> push($self -> _process_scalar("Class = $bless_type", 'BLESS') );
 		}
 
 		if ($ref_type eq 'ARRAY')
 		{
-			$self -> _process_arrayref($parent, $item);
+			$self -> index_stack -> push($index);
+			$self -> _process_arrayref($item);
+
+			$index = $self -> index_stack -> pop;
 		}
 		elsif ($ref_type eq 'HASH')
 		{
@@ -149,15 +177,13 @@ sub _process_arrayref
 		}
 		else
 		{
-			# These are the scalar array elements.
-
-			$index++;
-
 			$self -> _process_scalar("$index = " . (defined($item) ? truncstr($item, $self -> max_value_length) : 'undef') );
 		}
 
-		$self -> stack -> pop if ($bless_type);
+		$self -> node_stack -> pop if ($bless_type);
 	}
+
+	$self -> node_stack -> pop;
 
 } # End of _process_arrayref;
 
@@ -166,7 +192,7 @@ sub _process_arrayref
 sub _process_hashref
 {
 	my($self, $parent, $data) = @_;
-	my($tos)  = $self -> stack -> length - 1;
+	my($tos)  = $self -> node_stack -> length - 1;
 
 	print "Entered _process_hashref($parent, $data)\n" if ($self -> verbose);
 
@@ -188,16 +214,24 @@ sub _process_hashref
 
 		if ($bless_type)
 		{
-			$self -> stack -> push($node);
+			$self -> node_stack -> push($node);
 
 			$node = $self -> _process_scalar("Class = $bless_type", 'BLESS');
 		}
+		else
+		{
+			$node = $self -> _process_scalar('{}', 'HASHREF');
 
-		$self -> stack -> push($node);
+			$self -> node_stack -> push($node);
+		}
+
+		$self -> node_stack -> push($node);
 
 		if ($ref_type eq 'ARRAY')
 		{
-			$self -> _process_arrayref($node, $value);
+			$self -> index_stack -> push(-1);
+			$self -> _process_arrayref($value);
+			$self -> index_stack -> pop;
 		}
 		elsif ($ref_type eq 'HASH')
 		{
@@ -211,9 +245,13 @@ sub _process_hashref
 		{
 			$self -> _process_scalar($$value, undef);
 		}
+		else
+		{
+			print "WTF. ref_type: $ref_type. \n";
+		}
 
-		$self -> stack -> pop;
-		$self -> stack -> pop if ($bless_type);
+		$self -> node_stack -> pop;
+		$self -> node_stack -> pop;
 	}
 
 } # End of _process_hashref.
@@ -316,7 +354,7 @@ sub process_tree
 
 sub run
 {
-	my($self, $s) = @_;
+	my($self, $s, $literal) = @_;
 	$s = defined($s) ? $s : 'undef';
 
 	$self -> root
@@ -327,19 +365,20 @@ sub run
 			name       => $self -> title,
 		})
 	);
-	$self -> stack -> push($self -> root);
+	$self -> node_stack -> push($self -> root);
+	$self -> index_stack -> push(0);
 
 	my($bless_type) = blessed $s;
 	my($ref_type)   = reftype $s || 'VALUE';
 
 	if ($bless_type)
 	{
-		$self -> stack -> push($self -> _process_scalar("Class = $bless_type", 'BLESS') );
+		$self -> node_stack -> push($self -> _process_scalar("Class = $bless_type", 'BLESS') );
 	}
 
 	if ($ref_type eq 'ARRAY')
 	{
-		$self -> _process_arrayref($self -> root, $s);
+		$self -> _process_arrayref($s);
 	}
 	elsif ($ref_type eq 'HASH')
 	{
@@ -358,9 +397,10 @@ sub run
 		$self -> _process_scalar($s, 'VALUE');
 	}
 
-	$self -> stack -> pop if ($bless_type);
+	$self -> node_stack -> pop if ($bless_type);
 	$self -> process_tree;
 
+	print "$literal\n";
 	return $self -> root -> tree2string({no_attributes => 1 - $self -> attributes});
 
 } # End of run.
