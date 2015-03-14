@@ -147,31 +147,31 @@ sub _process_arrayref
 		if (! defined $parent)
 		{
 			my($i)  = $self -> index_stack -> last;
-			$parent = $self -> _process_scalar("$i []", 'ARRAY');
+			$parent = $self -> _process_scalar("$i []", 'Array');
 
 			$self -> node_stack -> push($parent);
 		}
 
-		$bless_type = blessed $item;
-		$ref_type   = reftype($item) || 'VALUE';
+		$bless_type = ucfirst lc (blessed($item) || '');
+		$ref_type   = ucfirst lc (reftype($item) || 'Value');
 
 		if ($bless_type)
 		{
-			$self -> node_stack -> push($self -> _process_scalar("Class = $bless_type", 'BLESS') );
+			$self -> node_stack -> push($self -> _process_scalar("Class = $bless_type", 'Bless') );
 		}
 
-		if ($ref_type eq 'ARRAY')
+		if ($ref_type eq 'Array')
 		{
 			$self -> index_stack -> push($index);
 			$self -> _process_arrayref($item);
 
 			$index = $self -> index_stack -> pop;
 		}
-		elsif ($ref_type eq 'HASH')
+		elsif ($ref_type eq 'Hash')
 		{
-			$self -> _process_hashref($parent, $item);
+			$self -> _process_hashref($item);
 		}
-		elsif ($ref_type eq 'SCALAR')
+		elsif ($ref_type eq 'Scalar')
 		{
 			$self -> _process_scalar($item);
 		}
@@ -191,21 +191,35 @@ sub _process_arrayref
 
 sub _process_hashref
 {
-	my($self, $parent, $data) = @_;
-	my($tos)  = $self -> node_stack -> length - 1;
+	my($self, $data) = @_;
+	my($index) = -1;
+	my($tos)   = $self -> node_stack -> length - 1;
 
-	print "Entered _process_hashref($parent, $data)\n" if ($self -> verbose);
+	print "Entered _process_hashref($data)\n" if ($self -> verbose);
 
 	my($bless_type);
 	my($node);
+	my($parent);
 	my($ref_type);
 	my($value);
 
 	for my $key (sort keys %$data)
 	{
+		$index++;
+
+		print "Index: $index. Key: $key. \n";
+
+		if (! defined $parent)
+		{
+			my($i)  = $self -> index_stack -> last;
+			$parent = $self -> _process_scalar('{}', 'Hash');
+
+			$self -> node_stack -> push($parent);
+		}
+
 		$value      = $$data{$key};
-		$bless_type = blessed $value;
-		$ref_type   = reftype($value) || 'VALUE';
+		$bless_type = ucfirst lc (blessed($value) || '');
+		$ref_type   = ucfirst lc (reftype($value) || 'Value');
 		$node       = $self -> _add_daughter
 			(
 				truncstr($key, $self -> max_key_length),
@@ -216,32 +230,27 @@ sub _process_hashref
 		{
 			$self -> node_stack -> push($node);
 
-			$node = $self -> _process_scalar("Class = $bless_type", 'BLESS');
-		}
-		else
-		{
-			$node = $self -> _process_scalar('{}', 'HASHREF');
-
-			$self -> node_stack -> push($node);
+			$node = $self -> _process_scalar("Class = $bless_type", 'Bless');
 		}
 
 		$self -> node_stack -> push($node);
 
-		if ($ref_type eq 'ARRAY')
+		if ($ref_type eq 'Array')
 		{
-			$self -> index_stack -> push(-1);
+			$self -> index_stack -> push($index);
 			$self -> _process_arrayref($value);
-			$self -> index_stack -> pop;
+
+			$index = $self -> index_stack -> pop;
 		}
-		elsif ($ref_type eq 'HASH')
+		elsif ($ref_type eq 'Hash')
 		{
-			$self -> _process_hashref($parent, $value);
+			$self -> _process_hashref($value);
 		}
-		elsif ($ref_type eq 'REF')
+		elsif ($ref_type eq 'Ref')
 		{
 			$self -> _process_scalar($$value, undef);
 		}
-		elsif ($ref_type eq 'SCALAR')
+		elsif ($ref_type eq 'Scalar')
 		{
 			$self -> _process_scalar($$value, undef);
 		}
@@ -251,8 +260,9 @@ sub _process_hashref
 		}
 
 		$self -> node_stack -> pop;
-		$self -> node_stack -> pop;
 	}
+
+	$self -> node_stack -> pop;
 
 } # End of _process_hashref.
 
@@ -261,7 +271,7 @@ sub _process_hashref
 sub _process_scalar
 {
 	my($self, $value, $type) = @_;
-	$type ||= 'SCALAR';
+	$type ||= 'Scalar';
 
 	print "Entered _process_scalar($value, $type)\n" if ($self -> verbose);
 
@@ -315,18 +325,18 @@ sub process_tree
 
 			if ($$opt{seen}{$value})
 			{
-				$id = ($ref_type eq 'SCALAR') ? $key : "$key -> $$opt{seen}{$value}";
+				$id = ( ($ref_type eq 'Scalar') || ($key =~ /^Array|Hash/) ) ? $key : "$key -> $$opt{seen}{$value}";
 			}
-			elsif ($ref_type eq 'CODE')
+			elsif ($ref_type eq 'Code')
 			{
 				$id   = $key;
 				$name = "$name = $value";
 			}
-			elsif ($ref_type eq 'REF')
+			elsif ($ref_type eq 'Ref')
 			{
 				$id  = $$opt{seen}{$$value} ? "$key -> $$opt{seen}{$$value}" : $key;
 			}
-			elsif ($ref_type eq 'VALUE')
+			elsif ($ref_type eq 'Value')
 			{
 				$id   = $key;
 				$name = (defined($name) ? truncstr($name, $self -> max_key_length) : 'undef') . ' = ' . (defined($value) ? truncstr($value, $self -> max_value_length) : 'undef');
@@ -368,33 +378,33 @@ sub run
 	$self -> node_stack -> push($self -> root);
 	$self -> index_stack -> push(0);
 
-	my($bless_type) = blessed $s;
-	my($ref_type)   = reftype $s || 'VALUE';
+	my($bless_type) = ucfirst lc (blessed($s) || '');
+	my($ref_type)   = ucfirst lc (reftype($s) || 'Value');
 
 	if ($bless_type)
 	{
-		$self -> node_stack -> push($self -> _process_scalar("Class = $bless_type", 'BLESS') );
+		$self -> node_stack -> push($self -> _process_scalar("Class = $bless_type", 'Bless') );
 	}
 
-	if ($ref_type eq 'ARRAY')
+	if ($ref_type eq 'Array')
 	{
 		$self -> _process_arrayref($s);
 	}
-	elsif ($ref_type eq 'HASH')
+	elsif ($ref_type eq 'Hash')
 	{
-		$self -> _process_hashref($self -> root, $s);
+		$self -> _process_hashref($s);
 	}
-	elsif ($ref_type eq 'REF')
+	elsif ($ref_type eq 'Ref')
 	{
 		$self -> _process_scalar($s);
 	}
-	elsif ($ref_type eq 'SCALAR')
+	elsif ($ref_type eq 'Scalar')
 	{
 		$self -> _process_scalar($s);
 	}
 	else
 	{
-		$self -> _process_scalar($s, 'VALUE');
+		$self -> _process_scalar($s, 'Value');
 	}
 
 	$self -> node_stack -> pop if ($bless_type);

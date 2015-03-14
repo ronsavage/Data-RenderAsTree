@@ -7,16 +7,14 @@ use Data::RenderAsTree;
 
 # ------------------------------------------------
 
-#my($s)        = ['a', ['b', 'c'], [d => {e => 'f', g => ['h', ['i'], 'j']}, 'k'], 'l', 'm'];
-#my($literal)  = q|['a', ['b', 'c'], [d => {e => 'f', g => ['h', ['i'], 'j']}, 'k'], 'l', 'm']|;
-#my($s)       = ['a'];
+#my($s)       =   ['a'];
 #my($literal) = q|['a']|;
-#my($s)       = ['a', 'b'];
+#my($s)       =   ['a', 'b'];
 #my($literal) = q|['a', 'b']|;
-#my($s)       = ['a', 'b', ['c'] ];
+#my($s)       =   ['a', 'b', ['c'] ];
 #my($literal) = q|['a', 'b', ['c'] ]|;
-my($s)       = ['a', 'b', ['c', 'd'], 'e', ['f', ['g', 'h', ['i'], 'j'], 'k', 'l'], 'm'];
-my($literal) = q|['a', 'b', ['c', 'd'], 'e', ['f', ['g', 'h', ['i'], 'j'], 'k', 'l'], 'm']|;
+my($s)        =   ['a', 'b', ['c', 'd'], 'e', ['f', ['g', 'h', ['i'], 'j'], 'k', 'l'], 'm'];
+my($literal)  = q|['a', 'b', ['c', 'd'], 'e', ['f', ['g', 'h', ['i'], 'j'], 'k', 'l'], 'm']|;
 my($result)   = Data::RenderAsTree -> new
 	(
 		attributes       => 0,
