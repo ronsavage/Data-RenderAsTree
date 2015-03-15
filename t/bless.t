@@ -17,7 +17,7 @@ my(%source) =
 		data     => Tree::DAG_Node -> new({name => 'Root', attributes => {one => 1} }),
 		expected => <<EOS
 Bless Demo
-    |--- Class = Tree::dag_node [Bless 1]
+    |--- Class = Tree::DAG_Node [Bless 1]
     |    |--- attributes = {} [Hash 2]
     |    |    |--- one = 1 [Value 3]
     |    |--- daughters [Array 4]
@@ -31,7 +31,7 @@ EOS
 		expected => <<EOS
 Bless Demo
     |--- root = {} [Hash 1]
-         |--- Class = Tree::dag_node [Bless 2]
+         |--- Class = Tree::DAG_Node [Bless 2]
          |    |--- attributes = {} [Hash 3]
          |    |    |--- one = 1 [Value 4]
          |    |--- daughters [Array 5]
