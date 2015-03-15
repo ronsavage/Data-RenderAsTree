@@ -3,23 +3,22 @@
 use strict;
 use warnings;
 
-#use Data::Dumper::Concise;
 use Data::RenderAsTree;
 
 use Test::More;
 
 # ------------------------------------------------
 
-my($count) = 0;
 my(%source) =
 (
 	1 =>
 	{
 		data     => undef,
-		expected => <<EOS
+		expected => <<EOS,
 Undef Demo
     |--- undef [VALUE 1]
 EOS
+		literal => q|undef|,
 	},
 );
 my($renderer) = Data::RenderAsTree -> new
@@ -33,15 +32,14 @@ my($renderer) = Data::RenderAsTree -> new
 
 my($expected);
 my($got);
+my($i);
 
-for my $i (sort keys %source)
+for $i (sort keys %source)
 {
 	$got      = $renderer -> run($source{$i}{data});
 	$expected = [split(/\n/, $source{$i}{expected})];
 
-	#diag "\n", Dumper($got), Dumper($expected);
-
-	is_deeply($got, $expected, 'Rendered'); $count++;
+	is_deeply($got, $expected, 'Rendered');
 }
 
-done_testing($count);
+done_testing($i);
