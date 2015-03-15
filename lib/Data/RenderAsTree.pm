@@ -110,11 +110,12 @@ sub _add_daughter
 
 	print "Entered _add_daughter($name, $attributes)\n" if ($self -> verbose);
 
-	$attributes       = {} if (! $attributes);
-	$$attributes{uid} = $self -> uid($self -> uid + 1);
-	$name             = truncstr($name, $self -> max_key_length);
-	my($node)         = Tree::DAG_Node -> new({name => $name, attributes => $attributes});
-	my($tos)          = $self -> node_stack -> length - 1;
+	$attributes        = {} if (! $attributes);
+	$$attributes{name} = $name;
+	$$attributes{uid}  = $self -> uid($self -> uid + 1);
+	$name              = truncstr($name, $self -> max_key_length);
+	my($node)          = Tree::DAG_Node -> new({name => $name, attributes => $attributes});
+	my($tos)           = $self -> node_stack -> length - 1;
 
 	die "Stack is empty\n" if ($tos < 0);
 
@@ -290,7 +291,7 @@ sub process_tree
 
 	if ($self -> verbose)
 	{
-		print "Entered process_tree(). Printing tree before walk_down ...\n" if ($self -> verbose);
+		print "Entered process_tree(). Printing tree before walk_down ...\n";
 		print join("\n", @{$self -> root -> tree2string({no_attributes => 0})}), "\n";
 		print '-' x 50, "\n";
 	}
@@ -317,11 +318,13 @@ sub process_tree
 			$name           = $node -> name;
 			$attributes     = $node -> attributes;
 			$type           = $$attributes{type};
-			$ref_type       = ($type =~ /^(\w+)/) ? $1 : $type;
+			$ref_type       = ($type =~ /^(\w+)/) ? $1 : $type; # Ignores '(0x12345678)'.
 			$uid            = $$attributes{uid};
 			$use_value      = $$attributes{use_value};
 			$value          = $$attributes{value};
 			$key            = "$ref_type $uid";
+
+			print "Key: $key. Name: $name. \n";
 
 			if (defined($value) && $$opt{seen}{$value})
 			{
@@ -531,9 +534,11 @@ L<Data::RenderAsTree> provides a mechanism to display a Perl data structure.
 
 The data supplied to L</run($s)> is stored in an object of type L<Tree::DAG_Node>.
 
-C<run()> returns an arrayref by calling C<Tree::DAG_Node>'s C<tree2string()> method.
+C<run()> returns an arrayref by calling C<Tree::DAG_Node>'s C<tree2string()> method, so you can
+just print the return value as a string by using code as in synopsis.pl above.
 
-This means you can display as much or as little of the result as you wish.
+It also means you can display as much or as little of the result as you wish, by printing a range
+of array elements.
 
 Hash key lengths can be limited by L</max_key_length($int)>, and hash value lengths can be limited
 by L</max_value_length($int)>.
@@ -542,6 +547,29 @@ For sub-classing, see L</process_tree()>.
 
 The module serves as a simple replacement for L<Data::TreeDumper>, but without the huge set of
 features.
+
+For sample code, see these programs in the scripts/ directory of the distro:
+
+=over 4
+
+=item o array.pl
+
+=item o bless.pl
+
+=item o hash.pl
+
+=item o mixup.pl
+
+=item o ref.pl
+
+=item o synopsis.pl
+
+=back
+
+See also the test files t/*.t, which are basically copies of the above. And that means, like the
+*.pl above, all expected output is given in the source code.
+
+Lastly, see the L</FAQ> for details such as how to process the output tree yourself.
 
 =head1 Distributions
 
@@ -689,9 +717,103 @@ C<verbose> is a parameter to L</new()>.
 
 =head2 Can I process the tree myself?
 
-Sure. Just call L</root()> - after L</run()> - to get the root of the tree, and process it any way you wish.
+Sure. Just call L</root()> - after L</run()> - to get the root of the tree, and process it any way
+you wish.
 
-See L</process_tree()> for sample code.
+See L</process_tree()> for sample code. More information is in the docs for L<Tree::DAG_Node>
+especially under the discussion of C<walk_down()>.
+
+=head2 What are the attributes of the tree nodes?
+
+Firslty, each node has a name, which you can set or get with the C<name([$new_name])> method. Here,
+[] refer to an optional parameter.
+
+Secondly, the attributes of each node are held in a hashref, accessible with the C<attributes()>
+method. The returned hashref has these (key => value) pairs:
+
+=over 4
+
+=item o name => $string
+
+This is a copy of the name of the node. It's here because L</process_tree()> changes the name of
+some nodes as it walks the tree.
+
+=item o type => $string
+
+This is the C<reftype()> (from the module L</Scalar::Util>) of the value (see the C<value> key,
+below), or one of various strings I use, and hence has values like:
+
+=over 4
+
+=item o ARRAY
+
+The value is an arrayref.
+
+=item o BLESS
+
+The value is blessed into a class, who name is in the value.
+
+=item o CODE
+
+The value is a coderef.
+
+=item o HASH
+
+The value is a hashref.
+
+=item o REF
+
+The value is presumably a generic reference. I could not see an explanation which I skimmed the
+output of 'perldoc perlref'.
+
+=item o SCALAR
+
+The value is a scalarref.
+
+=item o VALUE
+
+The value is just a literal value.
+
+I did not use LITERAL because the 1-letter abbreviation 'L' clashes with the 1-letter abbreviation
+of 'LVALUE', which C<reftype()> can return.
+
+=back
+
+Other values returned by C<reftype()> are not used by this module.
+
+=item o uid => $integer
+
+Each node in the tree has a unique integer identifier, counting from 1 up.
+
+=item o use_value => $Boolean
+
+Node values (see next point) can be undef, and this flag serves the following purpose:
+
+=over
+
+=item o Zero
+
+Do not use the value. It's undef, and set by the code, and thus not a real node's value.
+
+=item o One
+
+The node's value really is undef, or any other value. Use it in the output.
+
+=back
+
+=item o value => $string
+
+Finally, the actual value of the node.
+
+=back
+
+=head2 Why are there so many levels in the output?
+
+Or: Couldn't you cut some cases showing '{}' and '[]'?
+
+Cutting them introduces other problems, especially when the input is a set of nested arrayrefs.
+
+See scripts/array.pl, example 4 (hash key 4), for such a case.
 
 =head2 Why do you decorate the output with e.g. [HASH 1] and not [H1]?
 
@@ -701,8 +823,8 @@ I feel the style [H1] used by L<Data::TreeDumper> is unnecessarily cryptic.
 
 The major alternatives are L<String::Truncate> and L<Text::Elide>, or re-inventing the wheel.
 
-The former seems too complex, and the latter truncates to whole words, which makes sense in some
-applications, but not for dumping raw data.
+The first module seems too complex, and the second truncates to whole words, which makes sense in
+some applications, but not for dumping raw data.
 
 =head2 How would I go about sub-classing this module?
 
