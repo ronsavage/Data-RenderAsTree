@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+#use Data::Dumper::Concise;
 use Data::RenderAsTree;
 
 use Test::More;
@@ -37,6 +38,8 @@ for my $i (sort keys %source)
 {
 	$got      = $renderer -> run($source{$i}{data});
 	$expected = [split(/\n/, $source{$i}{expected})];
+
+	#diag "\n", Dumper($got), Dumper($expected);
 
 	is_deeply($got, $expected, 'Rendered'); $count++;
 }

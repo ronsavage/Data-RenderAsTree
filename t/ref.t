@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Data::Dumper::Concise;
+#use Data::Dumper::Concise;
 use Data::RenderAsTree;
 
 use Test::More;
@@ -36,10 +36,10 @@ EOS
 	},
 	2 =>
 	{
-		data     => {S => \'s'}, # Use ' in comment for UltraEdit hiliting.
+		data     => {key => \'s'}, # Use ' in comment for UltraEdit hiliting.
 		expected => <<EOS
 Ref Demo
-    |--- S [SCALAR 1]
+    |--- key [SCALAR 1]
 EOS
 	},
 );
@@ -60,7 +60,7 @@ for my $i (sort keys %source)
 	$got      = [map{clean($_)} @{$renderer -> run($source{$i}{data})}];
 	$expected = [map{clean($_)} split(/\n/, $source{$i}{expected})];
 
-	diag "\n", Dumper($got), Dumper($expected);
+	#diag "\n", Dumper($got), Dumper($expected);
 
 	is_deeply($got, $expected, 'Rendered'); $count++;
 }

@@ -33,12 +33,8 @@ my($s)   =
 		}
 	},
 	DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD => 'd',
-	Object => Tree::DAG_Node -> new({name => 'A tree', attributes => {one => 1} }),
-#	S => \'s', # Use ' in comment for UltraEdit hiliting.
-};
-$s =
-{
-	S => \'s', # Use ' in comment for UltraEdit hiliting.
+	Object     => Tree::DAG_Node -> new({name => 'A tree', attributes => {one => 1} }),
+	Ref2Scalar => \'s', # Use ' in comment for UltraEdit hiliting.
 };
 my($result) = Data::RenderAsTree -> new
 	(
@@ -46,7 +42,7 @@ my($result) = Data::RenderAsTree -> new
 		max_key_length   => 15,
 		max_value_length => 10,
 		title            => 'Synopsis',
-		verbose          => 1,
+		verbose          => 0,
 	) -> run($s);
 
 print join("\n", @$result), "\n";

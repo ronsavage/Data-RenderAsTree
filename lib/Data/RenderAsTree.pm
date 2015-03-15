@@ -244,6 +244,11 @@ sub _process_hashref
 
 		$node = $self -> node_stack -> pop;
 		$node = $self -> node_stack -> pop if ($bless_type);
+
+		# TODO: Why don't we need this in _process_arrayref()?
+		# And ... Do we need to check after each pop above?
+
+		$self -> node_stack -> push($self -> root) if ($node -> is_root);
 	}
 
 } # End of _process_hashref.
