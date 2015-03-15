@@ -17,7 +17,7 @@ my(%source) =
 		data     => '',
 		expected => <<EOS
 Empty Demo
-    |---  = - [Value 1]
+    |---  = - [VALUE 1]
 EOS
 	},
 );

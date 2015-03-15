@@ -17,12 +17,12 @@ my(%source) =
 		data     => Tree::DAG_Node -> new({name => 'Root', attributes => {one => 1} }),
 		expected => <<EOS
 Bless Demo
-    |--- Class = Tree::DAG_Node [Bless 1]
-    |    |--- attributes = {} [Hash 2]
-    |    |    |--- one = 1 [Value 3]
-    |    |--- daughters [Array 4]
-    |--- mother = undef [Value 5]
-    |--- name = Root [Value 6]
+    |--- Class = Tree::DAG_Node [BLESS 1]
+    |    |--- attributes = {} [HASH 2]
+    |    |    |--- one = 1 [VALUE 3]
+    |    |--- daughters [ARRAY 4]
+    |--- mother = undef [VALUE 5]
+    |--- name = Root [VALUE 6]
 EOS
 	},
 	2 =>
@@ -30,13 +30,13 @@ EOS
 		data     => {root => Tree::DAG_Node -> new({name => 'Root', attributes => {one => 1} })},
 		expected => <<EOS
 Bless Demo
-    |--- root = {} [Hash 1]
-         |--- Class = Tree::DAG_Node [Bless 2]
-         |    |--- attributes = {} [Hash 3]
-         |    |    |--- one = 1 [Value 4]
-         |    |--- daughters [Array 5]
-         |--- mother = undef [Value 6]
-         |--- name = Root [Value 7]
+    |--- root = {} [HASH 1]
+         |--- Class = Tree::DAG_Node [BLESS 2]
+         |    |--- attributes = {} [HASH 3]
+         |    |    |--- one = 1 [VALUE 4]
+         |    |--- daughters [ARRAY 5]
+         |--- mother = undef [VALUE 6]
+         |--- name = Root [VALUE 7]
 EOS
 	},
 );

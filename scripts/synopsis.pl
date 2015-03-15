@@ -36,6 +36,10 @@ my($s)   =
 	Object => Tree::DAG_Node -> new({name => 'A tree', attributes => {one => 1} }),
 #	S => \'s', # Use ' in comment for UltraEdit hiliting.
 };
+$s =
+{
+	S => \'s', # Use ' in comment for UltraEdit hiliting.
+};
 my($result) = Data::RenderAsTree -> new
 	(
 		attributes       => 0,

@@ -17,7 +17,7 @@ my(%source) =
 		data     => undef,
 		expected => <<EOS
 Undef Demo
-    |--- undef = - [Value 1]
+    |--- undef = - [VALUE 1]
 EOS
 	},
 );

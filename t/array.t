@@ -17,8 +17,8 @@ my(%source) =
 		data     => ['a'],
 		expected => <<EOS
 Array Demo
-    |--- 0 [] [Array 1]
-         |--- 0 = a [Scalar 2]
+    |--- 0 [] [ARRAY 1]
+         |--- 0 = a [SCALAR 2]
 EOS
 	},
 	2 =>
@@ -26,9 +26,9 @@ EOS
 		data     => ['a', 'b'],
 		expected => <<EOS
 Array Demo
-    |--- 0 [] [Array 1]
-         |--- 0 = a [Scalar 2]
-         |--- 1 = b [Scalar 3]
+    |--- 0 [] [ARRAY 1]
+         |--- 0 = a [SCALAR 2]
+         |--- 1 = b [SCALAR 3]
 EOS
 	},
 	3 =>
@@ -36,11 +36,11 @@ EOS
 		data     => ['a', 'b', ['c'] ],
 		expected => <<EOS
 Array Demo
-    |--- 0 [] [Array 1]
-         |--- 0 = a [Scalar 2]
-         |--- 1 = b [Scalar 3]
-         |--- 2 [] [Array 4]
-              |--- 0 = c [Scalar 5]
+    |--- 0 [] [ARRAY 1]
+         |--- 0 = a [SCALAR 2]
+         |--- 1 = b [SCALAR 3]
+         |--- 2 [] [ARRAY 4]
+              |--- 0 = c [SCALAR 5]
 EOS
 	},
 	4 =>
@@ -48,24 +48,24 @@ EOS
 		data     => ['a', 'b', ['c', 'd'], 'e', ['f', ['g', 'h', ['i'], 'j'], 'k', 'l'], 'm'],
 		expected => <<EOS
 Array Demo
-    |--- 0 [] [Array 1]
-         |--- 0 = a [Scalar 2]
-         |--- 1 = b [Scalar 3]
-         |--- 2 [] [Array 4]
-         |    |--- 0 = c [Scalar 5]
-         |    |--- 1 = d [Scalar 6]
-         |--- 3 = e [Scalar 7]
-         |--- 4 [] [Array 8]
-         |    |--- 0 = f [Scalar 9]
-         |    |--- 1 [] [Array 10]
-         |    |    |--- 0 = g [Scalar 11]
-         |    |    |--- 1 = h [Scalar 12]
-         |    |    |--- 2 [] [Array 13]
-         |    |    |    |--- 0 = i [Scalar 14]
-         |    |    |--- 3 = j [Scalar 15]
-         |    |--- 2 = k [Scalar 16]
-         |    |--- 3 = l [Scalar 17]
-         |--- 5 = m [Scalar 18]
+    |--- 0 [] [ARRAY 1]
+         |--- 0 = a [SCALAR 2]
+         |--- 1 = b [SCALAR 3]
+         |--- 2 [] [ARRAY 4]
+         |    |--- 0 = c [SCALAR 5]
+         |    |--- 1 = d [SCALAR 6]
+         |--- 3 = e [SCALAR 7]
+         |--- 4 [] [ARRAY 8]
+         |    |--- 0 = f [SCALAR 9]
+         |    |--- 1 [] [ARRAY 10]
+         |    |    |--- 0 = g [SCALAR 11]
+         |    |    |--- 1 = h [SCALAR 12]
+         |    |    |--- 2 [] [ARRAY 13]
+         |    |    |    |--- 0 = i [SCALAR 14]
+         |    |    |--- 3 = j [SCALAR 15]
+         |    |--- 2 = k [SCALAR 16]
+         |    |--- 3 = l [SCALAR 17]
+         |--- 5 = m [SCALAR 18]
 EOS
 	},
 	5 =>
@@ -73,9 +73,9 @@ EOS
 		data     => [ ['a'] ],
 		expected => <<EOS
 Array Demo
-    |--- 0 [] [Array 1]
-         |--- 0 [] [Array 2]
-              |--- 0 = a [Scalar 3]
+    |--- 0 [] [ARRAY 1]
+         |--- 0 [] [ARRAY 2]
+              |--- 0 = a [SCALAR 3]
 EOS
 	},
 );

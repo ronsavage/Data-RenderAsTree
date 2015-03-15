@@ -17,7 +17,7 @@ my(%source) =
 		data     => {a => 'b'},
 		expected => <<EOS
 Hash Demo
-    |--- a = b [Value 1]
+    |--- a = b [VALUE 1]
 EOS
 	},
 	2 =>
@@ -25,8 +25,8 @@ EOS
 		data     => {a => 'b', c => 'd'},
 		expected => <<EOS
 Hash Demo
-    |--- a = b [Value 1]
-    |--- c = d [Value 2]
+    |--- a = b [VALUE 1]
+    |--- c = d [VALUE 2]
 EOS
 	},
 	3 =>
@@ -34,11 +34,11 @@ EOS
 		data     => {a => 'b', c => 'd', e => {f => 'g', h => 'i'} },
 		expected => <<EOS
 Hash Demo
-    |--- a = b [Value 1]
-    |--- c = d [Value 2]
-    |--- e = {} [Hash 3]
-         |--- f = g [Value 4]
-         |--- h = i [Value 5]
+    |--- a = b [VALUE 1]
+    |--- c = d [VALUE 2]
+    |--- e = {} [HASH 3]
+         |--- f = g [VALUE 4]
+         |--- h = i [VALUE 5]
 EOS
 	},
 	4 =>
@@ -46,8 +46,8 @@ EOS
 		data     => {a => {b => 'c'} },
 		expected => <<EOS
 Hash Demo
-    |--- a = {} [Hash 1]
-         |--- b = c [Value 2]
+    |--- a = {} [HASH 1]
+         |--- b = c [VALUE 2]
 EOS
 	},
 	5 =>
@@ -55,9 +55,9 @@ EOS
 		data     => {a => {b => 'c'}, d => 'e'},
 		expected => <<EOS
 Hash Demo
-    |--- a = {} [Hash 1]
-    |    |--- b = c [Value 2]
-    |--- d = e [Value 3]
+    |--- a = {} [HASH 1]
+    |    |--- b = c [VALUE 2]
+    |--- d = e [VALUE 3]
 EOS
 	},
 	6 =>
@@ -65,9 +65,9 @@ EOS
 		data     => {a => {b => {c => 'd'} } },
 		expected => <<EOS
 Hash Demo
-    |--- a = {} [Hash 1]
-         |--- b = {} [Hash 2]
-              |--- c = d [Value 3]
+    |--- a = {} [HASH 1]
+         |--- b = {} [HASH 2]
+              |--- c = d [VALUE 3]
 EOS
 	},
 	7 =>
@@ -75,16 +75,16 @@ EOS
 		data     => {a => 'b', c => 'd', e => {f => 'g', h => 'i', j => {k => 'l', m => 'n'}, o => 'p'}, q => 'r'},
 		expected => <<EOS
 Hash Demo
-    |--- a = b [Value 1]
-    |--- c = d [Value 2]
-    |--- e = {} [Hash 3]
-    |    |--- f = g [Value 4]
-    |    |--- h = i [Value 5]
-    |    |--- j = {} [Hash 6]
-    |    |    |--- k = l [Value 7]
-    |    |    |--- m = n [Value 8]
-    |    |--- o = p [Value 9]
-    |--- q = r [Value 10]
+    |--- a = b [VALUE 1]
+    |--- c = d [VALUE 2]
+    |--- e = {} [HASH 3]
+    |    |--- f = g [VALUE 4]
+    |    |--- h = i [VALUE 5]
+    |    |--- j = {} [HASH 6]
+    |    |    |--- k = l [VALUE 7]
+    |    |    |--- m = n [VALUE 8]
+    |    |--- o = p [VALUE 9]
+    |--- q = r [VALUE 10]
 EOS
 	},
 );

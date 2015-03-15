@@ -144,31 +144,31 @@ sub _process_arrayref
 		if (! defined $parent)
 		{
 			my($i)  = $self -> index_stack -> last;
-			$parent = $self -> _process_scalar("$i []", 'Array');
+			$parent = $self -> _process_scalar("$i []", 'ARRAY');
 
 			$self -> node_stack -> push($parent);
 		}
 
 		$bless_type = blessed($item) || '';
-		$ref_type   = ucfirst lc (reftype($item) || 'Value');
+		$ref_type   = reftype($item) || 'VALUE';
 
 		if ($bless_type)
 		{
-			$self -> node_stack -> push($self -> _process_scalar("Class = $bless_type", 'Bless') );
+			$self -> node_stack -> push($self -> _process_scalar("Class = $bless_type", 'BLESS') );
 		}
 
-		if ($ref_type eq 'Array')
+		if ($ref_type eq 'ARRAY')
 		{
 			$self -> index_stack -> push($index);
 			$self -> _process_arrayref($item);
 
 			$index = $self -> index_stack -> pop;
 		}
-		elsif ($ref_type eq 'Hash')
+		elsif ($ref_type eq 'HASH')
 		{
 			$self -> _process_hashref($item);
 		}
-		elsif ($ref_type eq 'Scalar')
+		elsif ($ref_type eq 'SCALAR')
 		{
 			$self -> _process_scalar($item);
 		}
@@ -205,10 +205,8 @@ sub _process_hashref
 
 		$value      = $$data{$key};
 		$bless_type = blessed($value) || '';
-		$ref_type   = ucfirst lc (reftype($value) || 'Value');
-
-
-		$key        = "$key = {}" if ($ref_type eq 'Hash');
+		$ref_type   = reftype($value) || 'VALUE';
+		$key        = "$key = {}" if ($ref_type eq 'HASH');
 		$node       = $self -> _add_daughter
 			(
 				truncstr($key, $self -> max_key_length),
@@ -219,25 +217,25 @@ sub _process_hashref
 		{
 			$self -> node_stack -> push($node);
 
-			$node = $self -> _process_scalar("Class = $bless_type", 'Bless');
+			$node = $self -> _process_scalar("Class = $bless_type", 'BLESS');
 		}
 
 		$self -> node_stack -> push($node);
 
-		if ($ref_type eq 'Array')
+		if ($ref_type eq 'ARRAY')
 		{
 			$self -> index_stack -> push($index);
 			$self -> _process_arrayref($value);
 
 			$index = $self -> index_stack -> pop;
 		}
-		elsif ($ref_type eq 'Hash')
-		{
-			$self -> _process_hashref($value);
-		}
-		elsif ($ref_type =~ /Code|Ref|Scalar|Value/)
+		elsif ($ref_type =~ /CODE|REF|SCALAR|VALUE/)
 		{
 			# Do nothing. sub _process_tree() will combine $key and $value.
+		}
+		elsif ($ref_type eq 'HASH')
+		{
+			$self -> _process_hashref($value);
 		}
 		else
 		{
@@ -255,7 +253,7 @@ sub _process_hashref
 sub _process_scalar
 {
 	my($self, $value, $type) = @_;
-	$type ||= 'Scalar';
+	$type ||= 'SCALAR';
 
 	print "Entered _process_scalar($value, $type)\n" if ($self -> verbose);
 
@@ -309,18 +307,18 @@ sub process_tree
 
 			if ($$opt{seen}{$value})
 			{
-				$id = ( ($ref_type eq 'Scalar') || ($key =~ /^Array|Hash/) ) ? $key : "$key -> $$opt{seen}{$value}";
+				$id = ( ($ref_type eq 'SCALAR') || ($key =~ /^ARRAY|HASH/) ) ? $key : "$key -> $$opt{seen}{$value}";
 			}
-			elsif ($ref_type eq 'Code')
+			elsif ($ref_type eq 'CODE')
 			{
 				$id   = $key;
 				$name = "$name = $value";
 			}
-			elsif ($ref_type eq 'Ref')
+			elsif ($ref_type eq 'REF')
 			{
 				$id  = $$opt{seen}{$$value} ? "$key -> $$opt{seen}{$$value}" : $key;
 			}
-			elsif ($ref_type eq 'Value')
+			elsif ($ref_type eq 'VALUE')
 			{
 				$id   = $key;
 				$name = (defined($name) ? truncstr($name, $self -> max_key_length) : 'undef') . ' = ' . (defined($value) ? truncstr($value, $self -> max_value_length) : 'undef');
@@ -363,22 +361,22 @@ sub run
 	$self -> index_stack -> push(0);
 
 	my($bless_type) = blessed($s) || '';
-	my($ref_type)   = ucfirst lc (reftype($s) || 'Value');
+	my($ref_type)   = reftype($s) || 'VALUE';
 
 	if ($bless_type)
 	{
-		$self -> node_stack -> push($self -> _process_scalar("Class = $bless_type", 'Bless') );
+		$self -> node_stack -> push($self -> _process_scalar("Class = $bless_type", 'BLESS') );
 	}
 
-	if ($ref_type eq 'Array')
+	if ($ref_type eq 'ARRAY')
 	{
 		$self -> _process_arrayref($s);
 	}
-	elsif ($ref_type eq 'Hash')
+	elsif ($ref_type eq 'HASH')
 	{
 		$self -> _process_hashref($s);
 	}
-	elsif ($ref_type =~ /Ref|Scalar|Value/)
+	elsif ($ref_type =~ /REF|SCALAR|VALUE/)
 	{
 		$self -> _process_scalar($s, $ref_type);
 	}
