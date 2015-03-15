@@ -20,7 +20,7 @@ my($s)   =
 		d      => \$sub,
 	},
 	B => [qw(element_1 element_2 element_3)],
-	C   =>
+	C =>
 	{
  		b =>
 		{

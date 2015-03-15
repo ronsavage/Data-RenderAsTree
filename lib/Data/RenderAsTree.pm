@@ -469,7 +469,7 @@ This is scripts/synopsis.pl:
 			d      => \$sub,
 		},
 		B => [qw(element_1 element_2 element_3)],
-		C   =>
+		C =>
 		{
 	 		b =>
 			{
@@ -826,6 +826,20 @@ See scripts/array.pl, example 4 (hash key 4), for such a case.
 =head2 Why do you decorate the output with e.g. [HASH 1] and not [H1]?
 
 I feel the style [H1] used by L<Data::TreeDumper> is unnecessarily cryptic.
+
+=head2 I found a problem with the output of synopsis.pl!
+
+It says:
+
+	|--- B [ARRAY 9]
+	|    |--- 1 = [] [ARRAY 10]
+
+Why is there a '1 = []' in there?
+
+Firstly, note that C<hash> keys are returned in sorted order.
+
+And, for C<hash> keys, that integer counts them, so C<A> would have gotten a 0, and C<C> would get a
+2, if they pointed to arrayrefs.
 
 =head2 Why did you use Text::Truncate?
 
