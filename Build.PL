@@ -39,6 +39,13 @@ $class -> new
 	{
 		'Module::Build' => 0.4211,
 	},
+	meta_merge =>
+	{
+		resources =>
+		{
+			repository => 'https://github.com/ronsavage/Data-RenderAsTree',
+		},
+	},
 	requires =>
 	{
 		'Data::Dumper::Concise' => 2.022,
@@ -57,6 +64,5 @@ $class -> new
 	{
 		'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Data-RenderAsTree',
 		'license' => 'http://opensource.org/licenses/Artistic-2.0',
-		'repository' => 'https://github.com/ronsavage/Data-RenderAsTree',
 	},
 ) -> create_build_script();
