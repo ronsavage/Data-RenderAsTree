@@ -697,9 +697,9 @@ See L</process_tree()> for sample code.
 
 I feel the style [H1] used by L<Data::TreeDumper> is unnecessarily cryptic.
 
-=head2 What did you use Text::Truncate?
+=head2 Why did you use Text::Truncate?
 
-The major alternatives are L<String::Truncate> and L<Text::Elide>.
+The major alternatives are L<String::Truncate> and L<Text::Elide>, or re-inventing the wheel.
 
 The former seems too complex, and the latter truncates to whole words, which makes sense in some
 applications, but not for dumping raw data.
