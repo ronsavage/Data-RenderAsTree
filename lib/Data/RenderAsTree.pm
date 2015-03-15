@@ -179,17 +179,10 @@ sub _process_arrayref
 			$self -> _process_scalar("$index = " . (defined($item) ? truncstr($item, $self -> max_value_length) : 'undef') );
 		}
 
-		if ($bless_type)
-		{
-			$node = $self -> node_stack -> pop;
-
-			$self -> node_stack -> push($node) if ($node -> is_root);
-		}
+		$node = $self -> node_stack -> pop if ($bless_type);
 	}
 
 	$node = $self -> node_stack -> pop;
-
-	$self -> node_stack -> push($node) if ($node -> is_root);
 
 } # End of _process_arrayref;
 
@@ -250,8 +243,6 @@ sub _process_hashref
 		}
 
 		$node = $self -> node_stack -> pop;
-
-		$self -> node_stack -> push($node) if ($node -> is_root);
 	}
 
 } # End of _process_hashref.
@@ -394,6 +385,9 @@ sub run
 	}
 
 	$self -> process_tree;
+
+	# Clean up in case user reuses this object.
+
 	$self -> node_stack -> pop;
 	$self -> index_stack -> pop;
 	$self -> node_stack -> pop if ($bless_type);
