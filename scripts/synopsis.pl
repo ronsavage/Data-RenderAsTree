@@ -34,7 +34,7 @@ my($s)   =
 	},
 	DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD => 'd',
 	Object     => Tree::DAG_Node -> new({name => 'A tree', attributes => {one => 1} }),
-	Ref2Scalar => \'s', # Use ' in comment for UltraEdit hiliting.
+	Ref2Scalar => \'A shortish string', # Use ' in comment for UltraEdit hiliting.
 };
 my($result) = Data::RenderAsTree -> new
 	(

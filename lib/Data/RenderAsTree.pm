@@ -483,7 +483,7 @@ This is scripts/synopsis.pl:
 		},
 		DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD => 'd',
 		Object     => Tree::DAG_Node -> new({name => 'A tree', attributes => {one => 1} }),
-		Ref2Scalar => \'s', # Use ' in comment for UltraEdit hiliting.
+		Ref2Scalar => \'A shortish string', # Use ' in comment for UltraEdit hiliting.
 	};
 	my($result) = Data::RenderAsTree -> new
 		(
@@ -534,6 +534,7 @@ This is the output of scripts/synopsis.pl:
 	         |              |--- mother = undef [VALUE 33]
 	         |              |--- name = A tree [VALUE 34]
 	         |--- Ref2Scalar = SCALAR(0x230a230) [SCALAR 35]
+	              |--- SCALAR(0x230a230) = A shortish string [SCALAR 36]
 
 =head1 Description
 
