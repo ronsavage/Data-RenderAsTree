@@ -149,7 +149,7 @@ sub _process_arrayref
 			$self -> node_stack -> push($parent);
 		}
 
-		$bless_type = ucfirst lc (blessed($item) || '');
+		$bless_type = blessed($item) || '';
 		$ref_type   = ucfirst lc (reftype($item) || 'Value');
 
 		if ($bless_type)
@@ -204,8 +204,10 @@ sub _process_hashref
 		$index++;
 
 		$value      = $$data{$key};
-		$bless_type = ucfirst lc (blessed($value) || '');
+		$bless_type = blessed($value) || '';
 		$ref_type   = ucfirst lc (reftype($value) || 'Value');
+
+
 		$key        = "$key = {}" if ($ref_type eq 'Hash');
 		$node       = $self -> _add_daughter
 			(
@@ -360,7 +362,7 @@ sub run
 	$self -> node_stack -> push($self -> root);
 	$self -> index_stack -> push(0);
 
-	my($bless_type) = ucfirst lc (blessed($s) || '');
+	my($bless_type) = blessed($s) || '';
 	my($ref_type)   = ucfirst lc (reftype($s) || 'Value');
 
 	if ($bless_type)
