@@ -458,7 +458,7 @@ This is scripts/synopsis.pl:
 			c123   => $sub,
 			d      => \$sub,
 		},
-		ARA => [qw(element_1 element_2 element_3)],
+		B => [qw(element_1 element_2 element_3)],
 		C   =>
 		{
 	 		b =>
@@ -472,47 +472,58 @@ This is scripts/synopsis.pl:
 			}
 		},
 		DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD => 'd',
-		Object => Tree::DAG_Node -> new({name => 'A tree'}),
-		S => \'s', # Use ' in comment.
+		Object     => Tree::DAG_Node -> new({name => 'A tree', attributes => {one => 1} }),
+		Ref2Scalar => \'s', # Use ' in comment for UltraEdit hiliting.
 	};
 	my($result) = Data::RenderAsTree -> new
 		(
 			attributes       => 0,
-			max_key_length   => 15,
-			max_value_length => 10,
+			max_key_length   => 25,
+			max_value_length => 20,
 			title            => 'Synopsis',
+			verbose          => 0,
 		) -> run($s);
 
 	print join("\n", @$result), "\n";
 
-This is t/expected.dat, the output of scripts/synopsis.pl:
+This is the output of scripts/synopsis.pl:
 
 	Synopsis
-	    |--- A [HASH 1]
-	    |    |--- a [HASH 2]
-	    |    |--- bbbbbb = CODE(0xe86390) [CODE 3]
-	    |    |--- c123 [CODE 4 -> CODE 3]
-	    |    |--- d [REF 5 -> CODE 3]
-	    |         |--- REF(0xe86210) [SCALAR 6]
-	    |--- ARA [ARRAY 7]
-	    |    |--- 0 = element_1 [SCALAR 8]
-	    |    |--- 1 = element_2 [SCALAR 9]
-	    |    |--- 2 = element_3 [SCALAR 10]
-	    |--- C [HASH 11]
-	    |    |--- b [HASH 12]
-	    |         |--- a [HASH 13]
-	    |              |--- a [HASH 14]
-	    |              |--- b = CODE(0x15209c8) [CODE 15]
-	    |              |--- c = 4299999... [VALUE 16]
-	    |--- DDDDDDDDDDDD... = d [VALUE 17]
-	    |--- Object [HASH 18]
-	    |    |--- attributes [HASH 20]
-	    |    |--- daughters [ARRAY 21]
-	    |    |--- mother = undef [VALUE 22]
-	    |    |--- name = A tree [VALUE 23]
-	    |--- Class = Tree::DAG_Node [BLESS 19 -> SCALAR 6]
-	    |--- S [SCALAR 24]
-	         |--- SCALAR(0x1536e18) [SCALAR 25]
+	    |--- {} [HASH 1]
+	         |--- A = {} [HASH 2]
+	         |    |--- {} [HASH 3]
+	         |         |--- a = {} [HASH 4]
+	         |         |    |--- {} [HASH 5]
+	         |         |--- bbbbbb = CODE(0x1c93e30) [CODE 6]
+	         |         |--- c123 [CODE 7 -> CODE 6]
+	         |         |--- d [REF 8 -> CODE 6]
+	         |--- B [ARRAY 9]
+	         |    |--- 1 = [] [ARRAY 10]
+	         |         |--- 0 = element_1 [SCALAR 11]
+	         |         |--- 1 = element_2 [SCALAR 12]
+	         |         |--- 2 = element_3 [SCALAR 13]
+	         |--- C = {} [HASH 14]
+	         |    |--- {} [HASH 15]
+	         |         |--- b = {} [HASH 16]
+	         |              |--- {} [HASH 17]
+	         |                   |--- a = {} [HASH 18]
+	         |                        |--- {} [HASH 19]
+	         |                             |--- a = {} [HASH 20]
+	         |                             |    |--- {} [HASH 21]
+	         |                             |--- b = CODE(0x2475c68) [CODE 22]
+	         |                             |--- c = 42999999999999999... [VALUE 23]
+	         |--- DDDDDDDDDDDDDDDDDDDDDD... = d [VALUE 24]
+	         |--- Object = {} [HASH 25]
+	         |    |--- Class = Tree::DAG_Node [BLESS 26]
+	         |         |--- {} [HASH 27]
+	         |              |--- attributes = {} [HASH 28]
+	         |              |    |--- {} [HASH 29]
+	         |              |         |--- one = 1 [VALUE 30]
+	         |              |--- daughters [ARRAY 31]
+	         |              |    |--- 1 = [] [ARRAY 32]
+	         |              |--- mother = undef [VALUE 33]
+	         |              |--- name = A tree [VALUE 34]
+	         |--- Ref2Scalar = SCALAR(0x230a230) [SCALAR 35]
 
 =head1 Description
 
