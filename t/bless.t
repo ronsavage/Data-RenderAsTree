@@ -44,8 +44,8 @@ EOS
 my($renderer) = Data::RenderAsTree -> new
 	(
 		attributes       => 0,
-		max_key_length   => 15,
-		max_value_length => 10,
+		max_key_length   => 25,
+		max_value_length => 20,
 		title            => 'Bless Demo',
 		verbose          => 0,
 	);

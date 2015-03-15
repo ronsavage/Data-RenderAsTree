@@ -112,6 +112,7 @@ sub _add_daughter
 
 	$attributes       = {} if (! $attributes);
 	$$attributes{uid} = $self -> uid($self -> uid + 1);
+	$name             = truncstr($name, $self -> max_key_length);
 	my($node)         = Tree::DAG_Node -> new({name => $name, attributes => $attributes});
 	my($tos)          = $self -> node_stack -> length - 1;
 
@@ -207,10 +208,15 @@ sub _process_hashref
 		$bless_type = blessed($value) || '';
 		$ref_type   = reftype($value) || 'VALUE';
 		$key        = "$key = {}" if ($ref_type eq 'HASH');
-		$node       = $self -> _add_daughter
+
+		# Values for use_value:
+		# 0: No, the value of value is undef. Ignore it.
+		# 1: Yes, The value may be undef, but use it.
+
+		$node = $self -> _add_daughter
 			(
-				truncstr($key, $self -> max_key_length),
-				{type => $ref_type, value => defined($value) ? $value : 'undef'}
+				$key,
+				{type => $ref_type, use_value => 1, value => $value}
 			);
 
 		if ($bless_type)
@@ -262,10 +268,14 @@ sub _process_scalar
 
 	print "Entered _process_scalar($value, $type)\n" if ($self -> verbose);
 
+	# Values for use_value:
+	# 0: No, the value of value is undef. Ignore it.
+	# 1: Yes, The value may be undef, but use it.
+
 	return $self -> _add_daughter
 			(
 				$value,
-				{type => $type, value => '-'}
+				{type => $type, use_value => 0, value => undef}
 			);
 
 } # End of _process_scalar.
@@ -284,12 +294,12 @@ sub process_tree
 	}
 
 	my($attributes);
-	my($id);
+	my($ignore_value, $id);
 	my($key);
 	my($name);
 	my($ref_type);
 	my($type);
-	my($uid);
+	my($uid, $use_value);
 	my($value);
 
 	$self -> root -> walk_down
@@ -305,28 +315,36 @@ sub process_tree
 			$name           = $node -> name;
 			$attributes     = $node -> attributes;
 			$type           = $$attributes{type};
-			$ref_type       = ($type =~ /^(\w+)/) ? $1 : $type; # substr($type, 0, 1);
+			$ref_type       = ($type =~ /^(\w+)/) ? $1 : $type;
 			$uid            = $$attributes{uid};
+			$use_value      = $$attributes{use_value};
 			$value          = $$attributes{value};
 			$key            = "$ref_type $uid";
 
-			if ($$opt{seen}{$value})
+			if (defined($value) && $$opt{seen}{$value})
 			{
-				$id = ( ($ref_type eq 'SCALAR') || ($key =~ /^ARRAY|HASH/) ) ? $key : "$key -> $$opt{seen}{$value}";
+				$id = ( ($ref_type eq 'SCALAR') || ($key =~ /^ARRAY|BLESS|HASH/) ) ? $key : "$key -> $$opt{seen}{$value}";
 			}
 			elsif ($ref_type eq 'CODE')
 			{
 				$id   = $key;
-				$name = "$name = $value";
+				$name = defined($value) ? "$name = $value" : $name;
 			}
 			elsif ($ref_type eq 'REF')
 			{
-				$id  = $$opt{seen}{$$value} ? "$key -> $$opt{seen}{$$value}" : $key;
+				$id  = defined($value) ? $$opt{seen}{$$value} ? "$key -> $$opt{seen}{$$value}" : $key : $key;
 			}
 			elsif ($ref_type eq 'VALUE')
 			{
 				$id   = $key;
-				$name = (defined($name) ? truncstr($name, $self -> max_key_length) : 'undef') . ' = ' . (defined($value) ? truncstr($value, $self -> max_value_length) : 'undef');
+				$name = defined($name) ? $name : 'undef';
+				$name .= ' = ' . truncstr(defined($value) ? $value : 'undef', $self -> max_value_length) if ($use_value);
+			}
+			elsif ($ref_type eq 'SCALAR')
+			{
+				$id   = $key;
+				$name = defined($name) ? $name : 'undef';
+				$name .= ' = ' . truncstr(defined($value) ? $value : 'undef', $self -> max_value_length) if ($use_value);
 			}
 			else
 			{
@@ -335,7 +353,7 @@ sub process_tree
 
 			$node -> name("$name [$id]");
 
-			$$opt{seen}{$value} = $id if (! defined $$opt{seen}{$value});
+			$$opt{seen}{$value} = $id if (defined($value) && ! defined $$opt{seen}{$value});
 
 			# Keep walking.
 

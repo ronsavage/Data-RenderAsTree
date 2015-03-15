@@ -18,15 +18,15 @@ my(%source) =
 		data     => undef,
 		expected => <<EOS
 Undef Demo
-    |--- undef = - [VALUE 1]
+    |--- undef [VALUE 1]
 EOS
 	},
 );
 my($renderer) = Data::RenderAsTree -> new
 	(
 		attributes       => 0,
-		max_key_length   => 15,
-		max_value_length => 10,
+		max_key_length   => 25,
+		max_value_length => 20,
 		title            => 'Undef Demo',
 		verbose          => 0,
 	);

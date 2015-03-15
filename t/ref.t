@@ -39,15 +39,15 @@ EOS
 		data     => {key => \'s'}, # Use ' in comment for UltraEdit hiliting.
 		expected => <<EOS
 Ref Demo
-    |--- key [SCALAR 1]
+    |--- key = SCALAR() [SCALAR 1]
 EOS
 	},
 );
 my($renderer) = Data::RenderAsTree -> new
 	(
 		attributes       => 0,
-		max_key_length   => 15,
-		max_value_length => 10,
+		max_key_length   => 25,
+		max_value_length => 20,
 		title            => 'Ref Demo',
 		verbose          => 0,
 	);
