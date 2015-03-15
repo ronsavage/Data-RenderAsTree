@@ -31,12 +31,12 @@ EOS
 		expected => <<EOS
 Bless Demo
     |--- root = {} [Hash 1]
-    |--- Class = Tree::dag_node [Bless 2]
-    |    |--- attributes = {} [Hash 3]
-    |    |    |--- one = 1 [Value 4]
-    |    |--- daughters [Array 5]
-    |--- mother = undef [Value 6]
-    |--- name = Root [Value 7]
+         |--- Class = Tree::dag_node [Bless 2]
+         |    |--- attributes = {} [Hash 3]
+         |    |    |--- one = 1 [Value 4]
+         |    |--- daughters [Array 5]
+         |--- mother = undef [Value 6]
+         |--- name = Root [Value 7]
 EOS
 	},
 );

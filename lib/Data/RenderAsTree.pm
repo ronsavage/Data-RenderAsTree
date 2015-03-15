@@ -3,8 +3,6 @@ package Data::RenderAsTree;
 use strict;
 use warnings;
 
-use Data::Dumper::Concise; # For Dumper().
-
 use Moo;
 
 use Scalar::Util qw/blessed reftype/;
@@ -217,6 +215,8 @@ sub _process_hashref
 
 		if ($bless_type)
 		{
+			$self -> node_stack -> push($node);
+
 			$node = $self -> _process_scalar("Class = $bless_type", 'Bless');
 		}
 
@@ -243,6 +243,7 @@ sub _process_hashref
 		}
 
 		$node = $self -> node_stack -> pop;
+		$node = $self -> node_stack -> pop if ($bless_type);
 	}
 
 } # End of _process_hashref.

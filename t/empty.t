@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 
-use Data::Dumper::Concise;
 use Data::RenderAsTree;
 
 use Test::More;
