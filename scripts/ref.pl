@@ -3,9 +3,8 @@
 use strict;
 use warnings;
 
+use Data::Dumper::Concise;
 use Data::RenderAsTree;
-
-use Test::More;
 
 # ------------------------------------------------
 # Remove things from strings which are run-dependent,
@@ -62,9 +61,6 @@ for $i (sort keys %source)
 	$got      = [map{clean($_)} @{$renderer -> run($source{$i}{data})}];
 	$expected = [map{clean($_)} split(/\n/, $source{$i}{expected})];
 
-	#diag "\n", Dumper($got), Dumper($expected);
-
-	is_deeply($got, $expected, 'Rendered');
+	print "$i: $source{$i}{literal}\n";
+	print Dumper($got);
 }
-
-done_testing($i);

@@ -129,26 +129,23 @@ sub _add_daughter
 sub _process_arrayref
 {
 	my($self, $value) = @_;
-	my($index) = -1;
 
 	print "Entered _process_arrayref($value)\n" if ($self -> verbose);
 
+	my($index)  = $self -> index_stack -> last;
+	my($parent) = $self -> _process_scalar("$index = []", 'ARRAY');
+
+	$self -> node_stack -> push($parent);
+
+	$index = -1;
+
 	my($bless_type);
 	my($node);
-	my($parent);
 	my($ref_type);
 
 	for my $item (@$value)
 	{
 		$index++;
-
-		if (! defined $parent)
-		{
-			my($i)  = $self -> index_stack -> last;
-			$parent = $self -> _process_scalar("$i []", 'ARRAY');
-
-			$self -> node_stack -> push($parent);
-		}
 
 		$bless_type = blessed($item) || '';
 		$ref_type   = reftype($item) || 'VALUE';
@@ -194,9 +191,12 @@ sub _process_hashref
 
 	print "Entered _process_hashref($data)\n" if ($self -> verbose);
 
+	my($parent) = $self -> _process_scalar('{}', 'HASH');
+
+	$self -> node_stack -> push($parent);
+
 	my($bless_type);
 	my($node);
-	my($parent);
 	my($ref_type);
 	my($value);
 
@@ -256,6 +256,8 @@ sub _process_hashref
 
 		$self -> node_stack -> push($self -> root) if ($node -> is_root);
 	}
+
+	$self -> node_stack -> pop;
 
 } # End of _process_hashref.
 

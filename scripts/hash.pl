@@ -3,9 +3,8 @@
 use strict;
 use warnings;
 
+use Data::Dumper::Concise;
 use Data::RenderAsTree;
-
-use Test::More;
 
 # ------------------------------------------------
 
@@ -126,7 +125,6 @@ for $i (sort keys %source)
 	$got      = $renderer -> run($source{$i}{data});
 	$expected = [split(/\n/, $source{$i}{expected})];
 
-	is_deeply($got, $expected, 'Rendered');
+	print "$i: $source{$i}{literal}\n";
+	print Dumper($got);
 }
-
-done_testing($i);
