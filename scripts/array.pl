@@ -104,5 +104,5 @@ for $i (sort keys %source)
 	$expected = [split(/\n/, $source{$i}{expected})];
 
 	print "$i: $source{$i}{literal}\n";
-	print Dumper($got);
+	print "Got: \n", Dumper($got), "Expected: \n", Dumper($expected);
 }

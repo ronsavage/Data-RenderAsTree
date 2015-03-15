@@ -40,6 +40,7 @@ EOS
 Ref Demo
     |--- {} [HASH 1]
          |--- key = SCALAR() [SCALAR 2]
+              |--- SCALAR() = s [SCALAR 3]
 EOS
 		literal => q|{key => \'s'}|, # Use ' in comment for UltraEdit hiliting.
 	},

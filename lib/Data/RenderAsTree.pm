@@ -238,7 +238,16 @@ sub _process_hashref
 		}
 		elsif ($ref_type =~ /CODE|REF|SCALAR|VALUE/)
 		{
-			# Do nothing. sub _process_tree() will combine $key and $value.
+			# Do nothing, except for scalars. sub _process_tree() will combine $key and $value.
+
+			if ($ref_type eq 'SCALAR')
+			{
+				$self -> _add_daughter
+					(
+						$value,
+						{type => $ref_type, use_value => 1, value => $$value}
+					);
+			}
 		}
 		elsif ($ref_type eq 'HASH')
 		{
@@ -323,8 +332,6 @@ sub process_tree
 			$use_value      = $$attributes{use_value};
 			$value          = $$attributes{value};
 			$key            = "$ref_type $uid";
-
-			print "Key: $key. Name: $name. \n";
 
 			if (defined($value) && $$opt{seen}{$value})
 			{
