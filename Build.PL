@@ -41,6 +41,7 @@ $class -> new
 	},
 	requires =>
 	{
+		'Data::Dumper::Concise' => 2.022,
 		'File::Slurp' => 9999.19,
 		'File::Spec' => 0,
 		'Moo' => 1.007000,
