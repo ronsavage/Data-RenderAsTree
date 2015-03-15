@@ -139,13 +139,9 @@ sub _process_arrayref
 	my($parent);
 	my($ref_type);
 
-	print "Length: $#$value. \n";
-
 	for my $item (@$value)
 	{
 		$index++;
-
-		print "_process_arrayref(). Index: $index. Item: $item. \n";
 
 		if (! defined $parent)
 		{
@@ -216,8 +212,6 @@ sub _process_hashref
 	{
 		$index++;
 
-		print "_process_hashref(). Index: $index. Key: $key. \n";
-
 		$value      = $$data{$key};
 		$bless_type = ucfirst lc (blessed($value) || '');
 		$ref_type   = ucfirst lc (reftype($value) || 'Value');
@@ -227,8 +221,6 @@ sub _process_hashref
 				truncstr($key, $self -> max_key_length),
 				{type => $ref_type, value => defined($value) ? $value : 'undef'}
 			);
-
-		print "Returned from _add_daughter\n";
 
 		if ($bless_type)
 		{
@@ -261,10 +253,6 @@ sub _process_hashref
 
 		$self -> node_stack -> push($node) if ($node -> is_root);
 	}
-
-	$node = $self -> node_stack -> pop;
-
-	$self -> node_stack -> push($node) if ($node -> is_root);
 
 } # End of _process_hashref.
 
@@ -405,8 +393,11 @@ sub run
 		die "Cannot handle the ref_type: $ref_type. \n";
 	}
 
-	$self -> node_stack -> pop if ($bless_type);
 	$self -> process_tree;
+	$self -> node_stack -> pop;
+	$self -> index_stack -> pop;
+	$self -> node_stack -> pop if ($bless_type);
+	$self -> uid(0);
 
 	return $self -> root -> tree2string({no_attributes => 1 - $self -> attributes});
 
