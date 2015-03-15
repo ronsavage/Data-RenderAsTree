@@ -117,6 +117,8 @@ sub _add_daughter
 	my($node)         = Tree::DAG_Node -> new({name => $name, attributes => $attributes});
 	my($tos)          = $self -> node_stack -> length - 1;
 
+	die "Stack is empty\n" if ($tos < 0);
+
 	${$self -> node_stack}[$tos] -> add_daughter($node);
 
 	return $node;
@@ -133,6 +135,7 @@ sub _process_arrayref
 	print "Entered _process_arrayref($value)\n" if ($self -> verbose);
 
 	my($bless_type);
+	my($node);
 	my($parent);
 	my($ref_type);
 
@@ -142,7 +145,7 @@ sub _process_arrayref
 	{
 		$index++;
 
-		print "Index: $index. Item: $item. \n";
+		print "_process_arrayref(). Index: $index. Item: $item. \n";
 
 		if (! defined $parent)
 		{
@@ -180,10 +183,17 @@ sub _process_arrayref
 			$self -> _process_scalar("$index = " . (defined($item) ? truncstr($item, $self -> max_value_length) : 'undef') );
 		}
 
-		$self -> node_stack -> pop if ($bless_type);
+		if ($bless_type)
+		{
+			$node = $self -> node_stack -> pop;
+
+			$self -> node_stack -> push($node) if ($node -> is_root);
+		}
 	}
 
-	$self -> node_stack -> pop;
+	$node = $self -> node_stack -> pop;
+
+	$self -> node_stack -> push($node) if ($node -> is_root);
 
 } # End of _process_arrayref;
 
@@ -193,7 +203,6 @@ sub _process_hashref
 {
 	my($self, $data) = @_;
 	my($index) = -1;
-	my($tos)   = $self -> node_stack -> length - 1;
 
 	print "Entered _process_hashref($data)\n" if ($self -> verbose);
 
@@ -207,29 +216,22 @@ sub _process_hashref
 	{
 		$index++;
 
-		print "Index: $index. Key: $key. \n";
-
-		if (! defined $parent)
-		{
-			my($i)  = $self -> index_stack -> last;
-			$parent = $self -> _process_scalar('{}', 'Hash');
-
-			$self -> node_stack -> push($parent);
-		}
+		print "_process_hashref(). Index: $index. Key: $key. \n";
 
 		$value      = $$data{$key};
 		$bless_type = ucfirst lc (blessed($value) || '');
 		$ref_type   = ucfirst lc (reftype($value) || 'Value');
+		$key        = "$key = {}" if ($ref_type eq 'Hash');
 		$node       = $self -> _add_daughter
 			(
 				truncstr($key, $self -> max_key_length),
 				{type => $ref_type, value => defined($value) ? $value : 'undef'}
 			);
 
+		print "Returned from _add_daughter\n";
+
 		if ($bless_type)
 		{
-			$self -> node_stack -> push($node);
-
 			$node = $self -> _process_scalar("Class = $bless_type", 'Bless');
 		}
 
@@ -246,23 +248,23 @@ sub _process_hashref
 		{
 			$self -> _process_hashref($value);
 		}
-		elsif ($ref_type eq 'Ref')
+		elsif ($ref_type =~ /Ref|Scalar|Value/)
 		{
-			$self -> _process_scalar($$value, undef);
-		}
-		elsif ($ref_type eq 'Scalar')
-		{
-			$self -> _process_scalar($$value, undef);
+			# Do nothing. sub _process_tree() will combine $key and $value.
 		}
 		else
 		{
-			print "WTF. ref_type: $ref_type. \n";
+			die "Cannot handle the ref_type: $ref_type. \n";
 		}
 
-		$self -> node_stack -> pop;
+		$node = $self -> node_stack -> pop;
+
+		$self -> node_stack -> push($node) if ($node -> is_root);
 	}
 
-	$self -> node_stack -> pop;
+	$node = $self -> node_stack -> pop;
+
+	$self -> node_stack -> push($node) if ($node -> is_root);
 
 } # End of _process_hashref.
 
@@ -364,7 +366,7 @@ sub process_tree
 
 sub run
 {
-	my($self, $s, $literal) = @_;
+	my($self, $s) = @_;
 	$s = defined($s) ? $s : 'undef';
 
 	$self -> root
@@ -394,23 +396,18 @@ sub run
 	{
 		$self -> _process_hashref($s);
 	}
-	elsif ($ref_type eq 'Ref')
+	elsif ($ref_type =~ /Ref|Scalar|Value/)
 	{
-		$self -> _process_scalar($s);
-	}
-	elsif ($ref_type eq 'Scalar')
-	{
-		$self -> _process_scalar($s);
+		$self -> _process_scalar($s, $ref_type);
 	}
 	else
 	{
-		$self -> _process_scalar($s, 'Value');
+		die "Cannot handle the ref_type: $ref_type. \n";
 	}
 
 	$self -> node_stack -> pop if ($bless_type);
 	$self -> process_tree;
 
-	print "$literal\n";
 	return $self -> root -> tree2string({no_attributes => 1 - $self -> attributes});
 
 } # End of run.
