@@ -49,6 +49,35 @@ Mixup Demo
 EOS
 		literal => q|[{a => 'b'}, ['c' => 'd'] ]|,
 	},
+	4 =>
+	{
+		data     => {a => ['b', 'c'] },
+		expected => <<EOS,
+Mixup Demo
+    |--- {} [HASH 1]
+         |--- a [ARRAY 2]
+              |--- 0 = [] [ARRAY 3]
+                   |--- 0 = b [SCALAR 4]
+                   |--- 1 = c [SCALAR 5]
+EOS
+		literal => q|{a => ['b', 'c'] }|,
+	},
+	5 =>
+	{
+		data     => {a => ['b', 'c'], d => {e => 'f'} },
+		expected => <<EOS,
+Mixup Demo
+    |--- {} [HASH 1]
+         |--- a [ARRAY 2]
+         |    |--- 0 = [] [ARRAY 3]
+         |         |--- 0 = b [SCALAR 4]
+         |         |--- 1 = c [SCALAR 5]
+         |--- d = {} [HASH 6]
+              |--- {} [HASH 7]
+                   |--- e = f [VALUE 8]
+EOS
+		literal => q|{a => ['b', 'c'], d => {e => 'f'} }|,
+	},
 );
 my($renderer) = Data::RenderAsTree -> new
 	(
