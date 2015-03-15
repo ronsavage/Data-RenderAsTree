@@ -233,13 +233,13 @@ sub _process_hashref
 		{
 			$self -> _process_hashref($value);
 		}
-		elsif ($ref_type =~ /Ref|Scalar|Value/)
+		elsif ($ref_type =~ /Code|Ref|Scalar|Value/)
 		{
 			# Do nothing. sub _process_tree() will combine $key and $value.
 		}
 		else
 		{
-			die "Cannot handle the ref_type: $ref_type. \n";
+			die "Sub _process_hashref() cannot handle the ref_type: $ref_type. \n";
 		}
 
 		$node = $self -> node_stack -> pop;
@@ -381,7 +381,7 @@ sub run
 	}
 	else
 	{
-		die "Cannot handle the ref_type: $ref_type. \n";
+		die "Sub run() cannot handle the ref_type: $ref_type. \n";
 	}
 
 	$self -> process_tree;

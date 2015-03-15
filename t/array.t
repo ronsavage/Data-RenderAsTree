@@ -68,6 +68,16 @@ Array Demo
          |--- 5 = m [Scalar 18]
 EOS
 	},
+	5 =>
+	{
+		data     => [ ['a'] ],
+		expected => <<EOS
+Array Demo
+    |--- 0 [] [Array 1]
+         |--- 0 [] [Array 2]
+              |--- 0 = a [Scalar 3]
+EOS
+	},
 );
 my($renderer) = Data::RenderAsTree -> new
 	(

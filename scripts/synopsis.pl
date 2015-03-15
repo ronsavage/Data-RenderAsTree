@@ -19,7 +19,7 @@ my($s)   =
 		c123   => $sub,
 		d      => \$sub,
 	},
-	ARA => [qw(element_1 element_2 element_3)],
+	B => [qw(element_1 element_2 element_3)],
 	C   =>
 	{
  		b =>
@@ -34,7 +34,7 @@ my($s)   =
 	},
 	DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD => 'd',
 	Object => Tree::DAG_Node -> new({name => 'A tree'}),
-	S => \'s', # Use ' in comment.
+#	S => \'s', # Use ' in comment for UltraEdit hiliting.
 };
 my($result) = Data::RenderAsTree -> new
 	(
@@ -42,7 +42,7 @@ my($result) = Data::RenderAsTree -> new
 		max_key_length   => 15,
 		max_value_length => 10,
 		title            => 'Synopsis',
-		verbose          => 0,
+		verbose          => 1,
 	) -> run($s);
 
 print join("\n", @$result), "\n";
