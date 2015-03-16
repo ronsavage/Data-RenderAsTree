@@ -58,7 +58,7 @@ my($i);
 
 for $i (sort keys %source)
 {
-	$got      = [map{clean($_)} @{$renderer -> run($source{$i}{data})}];
+	$got      = [map{clean($_)} @{$renderer -> render($source{$i}{data})}];
 	$expected = [map{clean($_)} split(/\n/, $source{$i}{expected})];
 
 	print "$i: $source{$i}{literal}\n";

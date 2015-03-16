@@ -122,7 +122,7 @@ my($i);
 
 for $i (sort keys %source)
 {
-	$got      = $renderer -> run($source{$i}{data});
+	$got      = $renderer -> render($source{$i}{data});
 	$expected = [split(/\n/, $source{$i}{expected})];
 
 	print "$i: $source{$i}{literal}\n";

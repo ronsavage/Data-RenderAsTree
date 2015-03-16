@@ -379,7 +379,7 @@ sub process_tree
 
 # ------------------------------------------------
 
-sub run
+sub render
 {
 	my($self, $s) = @_;
 	$s = defined($s) ? $s : 'undef';
@@ -417,7 +417,7 @@ sub run
 	}
 	else
 	{
-		die "Sub run() cannot handle the ref_type: $ref_type. \n";
+		die "Sub render() cannot handle the ref_type: $ref_type. \n";
 	}
 
 	$self -> process_tree;
@@ -431,7 +431,7 @@ sub run
 
 	return $self -> root -> tree2string({no_attributes => 1 - $self -> attributes});
 
-} # End of run.
+} # End of render.
 
 # ------------------------------------------------
 
@@ -492,7 +492,7 @@ This is scripts/synopsis.pl:
 			max_value_length => 20,
 			title            => 'Synopsis',
 			verbose          => 0,
-		) -> run($s);
+		) -> render($s);
 
 	print join("\n", @$result), "\n";
 
@@ -540,9 +540,9 @@ This is the output of scripts/synopsis.pl:
 
 L<Data::RenderAsTree> provides a mechanism to display a Perl data structure.
 
-The data supplied to L</run($s)> is stored in an object of type L<Tree::DAG_Node>.
+The data supplied to L</render($s)> is stored in an object of type L<Tree::DAG_Node>.
 
-C<run()> returns an arrayref by calling C<Tree::DAG_Node>'s C<tree2string()> method, so you can
+C<render()> returns an arrayref by calling C<Tree::DAG_Node>'s C<tree2string()> method, so you can
 just print the return value as a string by using code as in synopsis.pl above.
 
 It also means you can display as much or as little of the result as you wish, by printing a range
@@ -684,7 +684,7 @@ See L</Constructor and Initialization> for details on the parameters accepted by
 
 =head2 process_tree()
 
-Just before L</run($s)> returns, it calls C<process_tree()>, while walks the tree and adjusts
+Just before L</render($s)> returns, it calls C<process_tree()>, while walks the tree and adjusts
 various bits of data attached to each node in the tree.
 
 If sub-classing this module, e.g. to change the precise text displayed, I recommend concentrating
@@ -696,13 +696,13 @@ Alternately, see the answer to the first question in the L</FAQ>.
 
 Returns the root node in the tree, which is an object of type L<Tree::DAG_Node>.
 
-=head2 run($s)
+=head2 render($s)
 
 Renders $s into an object of type L<Tree::DAG_Node>.
 
 Returns an arrayref after calling the C<tree2string()> method for L<Tree::DAG_Node>.
 
-See L</Synopsis> for typical usage.
+See L</Synopsis> for a typical usage.
 
 =head2 title([$s])
 
@@ -725,8 +725,8 @@ C<verbose> is a parameter to L</new()>.
 
 =head2 Can I process the tree myself?
 
-Sure. Just call L</root()> - after L</run()> - to get the root of the tree, and process it any way
-you wish.
+Sure. Just call L</root()> - after L</render()> - to get the root of the tree, and process it any
+way you wish.
 
 See L</process_tree()> for sample code. More information is in the docs for L<Tree::DAG_Node>
 especially under the discussion of C<walk_down()>.
@@ -736,8 +736,8 @@ especially under the discussion of C<walk_down()>.
 Firslty, each node has a name, which you can set or get with the C<name([$new_name])> method. Here,
 [] refer to an optional parameter.
 
-Secondly, the attributes of each node are held in a hashref, accessible with the C<attributes()>
-method. The returned hashref has these (key => value) pairs:
+Secondly, the attributes of each node are held in a hashref, getable and setable with the
+C<attributes([$hashref])> method. The returned hashref has these (key => value) pairs:
 
 =over 4
 
