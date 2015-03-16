@@ -1,4 +1,7 @@
 Revision history for Perl extension Data::RenderAsTree.
 
+1.01  Mon Mar 16 12:44:00 2015
+	- Remove scripts/data.tree.dumper.pl, which required the dread Data::TreeDumper.
+
 1.00  Sun Mar  7 17:12:00 2015
 	  - Original version

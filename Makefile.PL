@@ -30,8 +30,6 @@ my(%params) =
 	PREREQ_PM =>
 	{
 		'Data::Dumper::Concise' => 2.022,
-		'File::Slurp' => 9999.19,
-		'File::Spec' => 0,
 		'Moo' => 1.007000,
 		'Scalar::Util' => 1.41,
 		'Set::Array' => 0.30,
