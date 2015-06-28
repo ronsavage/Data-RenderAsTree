@@ -15,6 +15,14 @@ use Tree::DAG_Node;
 
 use Types::Standard qw/Any Bool Int Object Str/;
 
+has clean_nodes =>
+(
+	default  => sub{return 0},
+	is       => 'rw',
+	isa      => Bool,
+	required => 0,
+);
+
 has attributes =>
 (
 	default  => sub{return 0},
@@ -124,6 +132,65 @@ sub _add_daughter
 	return $node;
 
 } # End of _add_daughter.
+
+# --------------------------------------------------
+
+sub clean_tree
+{
+	my($self) = @_;
+
+	my($attributes);
+	my($key);
+	my($name);
+	my($value);
+
+	$self -> renderer -> root -> walk_down
+	({
+		callback => sub
+		{
+			my($node, $opt) = @_;
+			$name           = $node -> name;
+
+			if (! defined $name)
+			{
+				$name = '';
+
+				$node -> name('');
+			}
+
+			$attributes = $node -> attributes;
+
+			if (exists $$attributes{undef})
+			{
+				if (exists $$attributes{''})
+				{
+					$$attributes{''} = $$attributes{undef};
+
+					delete $$attributes{undef};
+				}
+				else
+				{
+					$$attributes{''} = $$attributes{undef};
+
+					delete $$attributes{undef};
+				}
+			}
+
+			for $key (keys %$attributes)
+			{
+				$key = '' if (! defined $key);
+				$value = $$attributes{$key};
+				$value = '' if (! defined $value);
+			}
+
+			$node -> attributes($attributes);
+
+			return 1; # Keep walking.
+		},
+		_depth => 0,
+	});
+
+} # End of clean_tree.
 
 # ------------------------------------------------
 
@@ -433,6 +500,7 @@ sub run
 	}
 
 	$self -> process_tree;
+	$self -> clean_tree if ($self -> clean_nodes);
 
 	# Clean up in case user reuses this object.
 
