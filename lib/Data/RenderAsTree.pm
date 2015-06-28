@@ -382,6 +382,18 @@ sub process_tree
 sub render
 {
 	my($self, $s) = @_;
+
+	$self -> run($s);
+
+	return $self -> root -> tree2string({no_attributes => 1 - $self -> attributes});
+
+} # End of render.
+
+# ------------------------------------------------
+
+sub run
+{
+	my($self, $s) = @_;
 	$s = defined($s) ? $s : 'undef';
 
 	$self -> root
@@ -429,9 +441,7 @@ sub render
 	$self -> node_stack -> pop if ($bless_type);
 	$self -> uid(0);
 
-	return $self -> root -> tree2string({no_attributes => 1 - $self -> attributes});
-
-} # End of render.
+} # End of run.
 
 # ------------------------------------------------
 
@@ -495,6 +505,8 @@ This is scripts/synopsis.pl:
 		) -> render($s);
 
 	print join("\n", @$result), "\n";
+
+See the L</FAQ> for a discussion as to whether you should call L</render($s)> or L</run($s)>.
 
 This is the output of scripts/synopsis.pl:
 
@@ -690,11 +702,7 @@ various bits of data attached to each node in the tree.
 If sub-classing this module, e.g. to change the precise text displayed, I recommend concentrating
 your efforts on this method.
 
-Alternately, see the answer to the first question in the L</FAQ>.
-
-=head2 root()
-
-Returns the root node in the tree, which is an object of type L<Tree::DAG_Node>.
+Also, see the answer to the first question in the L</FAQ>.
 
 =head2 render($s)
 
@@ -703,6 +711,24 @@ Renders $s into an object of type L<Tree::DAG_Node>.
 Returns an arrayref after calling the C<tree2string()> method for L<Tree::DAG_Node>.
 
 See L</Synopsis> for a typical usage.
+
+See also L</run($s)>, which returns the root of the tree.
+
+The choice of calling C<render()> or C<run()> is discussed in the L</FAQ>.
+
+=head2 root()
+
+Returns the root node in the tree, which is an object of type L<Tree::DAG_Node>.
+
+=head2 run($s)
+
+Renders $s into an object of type L<Tree::DAG_Node>.
+
+Returns the root of the tree.
+
+See also L</render($s)>, which returns an arrayref of the tree's data.
+
+The choice of calling C<render()> or C<run()> is discussed in the L</FAQ>.
 
 =head2 title([$s])
 
@@ -725,11 +751,31 @@ C<verbose> is a parameter to L</new()>.
 
 =head2 Can I process the tree myself?
 
-Sure. Just call L</root()> - after L</render()> - to get the root of the tree, and process it any
-way you wish.
+Sure. Just call L</render($s)> and then L</root($s)> to get the root of the tree, and process it
+any way you wish.
+
+Otherwise, call L</root($s)>, which returns the root directly.
+
+See the next question for help in choosing between C<render()> and C<root()>.
 
 See L</process_tree()> for sample code. More information is in the docs for L<Tree::DAG_Node>
 especially under the discussion of C<walk_down()>.
+
+=head2 How do I choose between calling C<render()> and C<root()>?
+
+L</render($s)> automatically calls L<Tree::DAG_Node>'s C<tree2string()> method, which you may not
+want.
+
+For instance, the tree might have undef as the name of node, or the value of an attribute, so that
+calling C<tree2string()> triggers undefined variable warnings when converting the node's attributes
+to a string.
+
+With L</run($s)>, since C<tree2string()> is not called, you have time to process the tree yourself,
+cleaning up the nodes, before converting it to an arrayref of strings by calling C<tree2string()>
+directly. Indeed, with C<run()> you may never call C<tree2string()> at all.
+
+Users of L<Marpa::R2> would normally call L</run($s)>. See L<MarpaX::Languages::Lua::Parser> for
+sample code, where node names of undef are the reason for this choice.
 
 =head2 What are the attributes of the tree nodes?
 
@@ -838,8 +884,8 @@ Why is there a '1 = []' in there?
 
 Firstly, note that C<hash> keys are returned in sorted order.
 
-And, for C<hash> keys, that integer counts them, so C<A> would have gotten a 0, and C<C> would get a
-2, if they pointed to arrayrefs.
+And, for C<hash> keys, that integer counts them, so C<A> would have gotten a 0, and C<C> would get
+a 2, if they pointed to arrayrefs.
 
 =head2 Why did you use Text::Truncate?
 
