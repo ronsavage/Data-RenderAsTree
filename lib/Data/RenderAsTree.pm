@@ -150,37 +150,31 @@ sub clean_tree
 		{
 			my($node, $opt) = @_;
 			$name           = $node -> name;
+			$attributes     = $node -> attributes;
 
-			if (! defined $name)
-			{
-				$name = '';
+			# For for name is undef.
 
-				$node -> name('');
-			}
+			$node -> name('') if (! defined $name);
 
-			$attributes = $node -> attributes;
+			# Fix for attribute name is undef.
 
 			if (exists $$attributes{undef})
 			{
-				if (exists $$attributes{''})
+				if (! exists $$attributes{''})
 				{
 					$$attributes{''} = $$attributes{undef};
-
-					delete $$attributes{undef};
 				}
-				else
-				{
-					$$attributes{''} = $$attributes{undef};
 
-					delete $$attributes{undef};
-				}
+				delete $$attributes{undef};
 			}
+
+			# Fix for attribute value is undef.
 
 			for $key (keys %$attributes)
 			{
-				$key = '' if (! defined $key);
-				$value = $$attributes{$key};
-				$value = '' if (! defined $value);
+				$value             = $$attributes{$key};
+				$value             = '' if (! defined $value);
+				$$attributes{$key} = $value;
 			}
 
 			$node -> attributes($attributes);
