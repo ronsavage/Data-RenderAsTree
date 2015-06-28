@@ -144,7 +144,7 @@ sub clean_tree
 	my($name);
 	my($value);
 
-	$self -> renderer -> root -> walk_down
+	$self -> root -> walk_down
 	({
 		callback => sub
 		{
