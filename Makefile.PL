@@ -41,7 +41,7 @@ my(%params) =
 		'Types::Standard' => 1.000005,
 		'warnings' => 0,
 	},
-	VERSION_FROM => 'lib/Tree/Renderer.pm',
+	VERSION_FROM => 'lib/Data/RenderAsTree.pm',
 );
 
 if ( ($ExtUtils::MakeMaker::VERSION =~ /^\d\.\d\d$/) && ($ExtUtils::MakeMaker::VERSION > 6.30) )
