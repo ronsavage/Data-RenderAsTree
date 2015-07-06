@@ -95,7 +95,7 @@ has verbose =>
 	required => 0,
 );
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 # ------------------------------------------------
 
@@ -704,6 +704,15 @@ output.
 
 Default: 0.
 
+=item o clean_nodes => $Boolean
+
+Clean up nodes before printing, by changing the node's name to '' (the empty string) if it's undef,
+and by changing to '' any node attribute value which is undef.
+
+Set to 1 to activate option.
+
+Default: 0.
+
 =item o max_key_length => $int
 
 Use this to limit the lengths of hash keys.
@@ -735,6 +744,38 @@ Gets or sets the attributes option.
 Note: The value passed to L<Tree::DAG_Node>'s C<tree2string()> method is (1 - $Boolean).
 
 C<attributes> is a parameter to L</new()>.
+
+=head2 clean_nodes([$Boolean])
+
+Gets or sets the value of the C<clean_nodes> option.
+
+This stops undef warnings when printing (i.e. when calling the tree's tree2string() method).
+
+Values:
+
+=over 4
+
+=item o 0
+
+Do not clean up nodes.
+
+=item o 1
+
+Clean up nodes by doing both these:
+
+=over 4
+
+=item o The node's name
+
+Change the node's name to '' (the empty string) if it's undef.
+
+=item o The node's attribute values
+
+Change to '' any node attribute value which is undef.
+
+=back
+
+=back
 
 =head2 max_key_length([$int])
 

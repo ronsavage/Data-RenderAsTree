@@ -1,5 +1,10 @@
 Revision history for Perl extension Data::RenderAsTree.
 
+1.02  Mon Jul  6 12:43:00 2015
+	- Add method run(), which does not call tree2string() automatically the way render() does.
+		run() is used by MarpaX::Languages::Lua::Parser.
+	- Add option clean_nodes() to stop undef warnings when printing via tree2string().
+
 1.01  Mon Mar 16 12:44:00 2015
 	- Remove scripts/data.tree.dumper.pl, which required the dread Data::TreeDumper.
 
