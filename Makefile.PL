@@ -30,14 +30,14 @@ my(%params) =
 	PREREQ_PM =>
 	{
 		'Data::Dumper::Concise' => 2.022,
-		'Moo' => 1.007000,
-		'Scalar::Util' => 1.41,
+		'Moo' => 2.000001,
+		'Scalar::Util' => 1.42,
 		'Set::Array' => 0.30,
 		'strict' => 0,
 		'Test::More' => 1.001014,
-		'Test::Pod' => 1.48,
+		'Test::Pod' => 1.51,
 		'Text::Truncate' => '1.06',
-		'Tree::DAG_Node' => 1.24,
+		'Tree::DAG_Node' => 1.26,
 		'Types::Standard' => 1.000005,
 		'warnings' => 0,
 	},
