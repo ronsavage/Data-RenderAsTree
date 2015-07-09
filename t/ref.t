@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+#use Data::Dumper::Concise; # For Dumper().
 use Data::RenderAsTree;
 
 use Test::More;
@@ -63,7 +64,7 @@ for $i (sort keys %source)
 	$got      = [map{clean($_)} @{$renderer -> render($source{$i}{data})}];
 	$expected = [map{clean($_)} split(/\n/, $source{$i}{expected})];
 
-	#diag "\n", Dumper($got), Dumper($expected);
+	#diag "\nGot:\n", Dumper($got), "Expected:\n", Dumper($expected);
 
 	is_deeply($got, $expected, 'Rendered');
 }
