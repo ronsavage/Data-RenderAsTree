@@ -152,7 +152,7 @@ sub clean_tree
 			$name           = $node -> name;
 			$attributes     = $node -> attributes;
 
-			# For for name is undef.
+			# Fix for name is undef.
 
 			$node -> name('') if (! defined $name);
 
