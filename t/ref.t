@@ -11,6 +11,9 @@ use Test::More;
 # ------------------------------------------------
 # Remove things from strings which are run-dependent,
 # e.g. memory addresses.
+# Warning: This only works if the max_key_length and max_value_length options have not shortened
+# the data so much that the '(' and ')' can't be found. In that case with, e.g., 'SCALAR(0x123...',
+# $s not parsed as expected and hence not converted into SCALAR().
 
 sub clean
 {
@@ -48,11 +51,9 @@ EOS
 );
 my($renderer) = Data::RenderAsTree -> new
 	(
-		attributes       => 0,
-		max_key_length   => 25,
-		max_value_length => 20,
-		title            => 'Ref Demo',
-		verbose          => 0,
+		attributes => 0,
+		title      => 'Ref Demo',
+		verbose    => 0,
 	);
 
 my($expected);
