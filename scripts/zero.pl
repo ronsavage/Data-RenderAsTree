@@ -14,9 +14,9 @@ my(%source) =
 (
 	1 =>
 	{
-		data     => undef,
+		data     => 0,
 		expected => 0,
-		literal => q|undef|,
+		literal => q|0|,
 	},
 );
 my($count)		= 0;

@@ -638,6 +638,8 @@ For sample code, see these programs in the scripts/ directory of the distro:
 
 =item o bless.pl
 
+=item o empty.pl
+
 =item o hash.pl
 
 =item o mixup.pl
@@ -645,6 +647,10 @@ For sample code, see these programs in the scripts/ directory of the distro:
 =item o ref.pl
 
 =item o synopsis.pl
+
+=item o undef.pl
+
+=item o zero.pl
 
 =back
 

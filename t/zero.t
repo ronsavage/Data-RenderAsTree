@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 
-use Data::Dumper::Concise; # For Dumper().
 use Data::RenderAsTree;
 
 use Test::More;
@@ -14,11 +13,12 @@ my(%source) =
 (
 	1 =>
 	{
-		data     => '',
-		expected => <<EOS
-Empty Demo. Attributes: {}
-    |---  [VALUE 1]. Attributes: {}
+		data     => 0,
+		expected => <<EOS,
+Undef Demo. Attributes: {}
+    |--- 0 [VALUE 1]. Attributes: {}
 EOS
+		literal => q|0|,
 	},
 );
 my($renderer) = Data::RenderAsTree -> new
@@ -26,7 +26,7 @@ my($renderer) = Data::RenderAsTree -> new
 		attributes       => 0,
 		max_key_length   => 25,
 		max_value_length => 20,
-		title            => 'Empty Demo',
+		title            => 'Undef Demo',
 		verbose          => 0,
 	);
 
