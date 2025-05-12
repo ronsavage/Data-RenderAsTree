@@ -6,6 +6,7 @@ Revision history for Perl extension Data::RenderAsTree.
 	- Add new test t/zero.t and script scripts/zero.pl.
 		The point of these 9 plain scripts is so you can use them without having to fiddle about
 		removing the test code in the corresponding test scripts.
+	- Add .gitignore, UltraEdit files and Data-RenderAsTree-.* to MANIFEST.SKIP.
 
 1.03  2015-07-12T17:01:00
 	- Remove the max_key_length and max_value_length options from t/ref.t so truncation of strings

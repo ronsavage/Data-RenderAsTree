@@ -2,6 +2,7 @@
 ,v$
 \B\.cvsignore$
 \B\.git\b
+\B\.gitignore\b
 \B\.svn\b
 \bCVS\b
 \bRCS\b
@@ -37,5 +38,11 @@
 #   Mac OSX SMB mount metadata files
 \B\._
 
+# Avoid UltraEdit files.
+\.prj$
+\.pui$
+
 ^MYMETA.yml$
 ^MYMETA\.json$
+
+^Data-RenderAsTree-.*
